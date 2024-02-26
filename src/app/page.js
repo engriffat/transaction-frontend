@@ -4,6 +4,11 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import { BsCopy } from "react-icons/bs";
+import { BsBoxArrowUpRight } from "react-icons/bs";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Sample transaction data
 const transactions = [
@@ -67,9 +72,12 @@ export default function Home() {
   };
 
   // Function to clear date selection
-  const clearDateSelection = () => {
+  const clearSelections = () => {
+    setFilterTxHash("");
     setStartDate(null);
     setEndDate(null);
+    setSortOrder("");
+    setSortedField("");
   };
 
   // Function to close the modal
@@ -77,97 +85,142 @@ export default function Home() {
     setIsModalOpen(false);
   };
 
+  // const [isCopied, setIsCopied] = useState(false);
+  const copyToClipboard = async (textToCopy) => {
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      toast.success('Copied!');
+    } catch (err) {
+      console.error('Unable to copy to clipboard.', err);
+    }
+  };
+
+
   return (
-    <main className="container mx-auto text-black">
-      {/* Filter options */}
-      <div className="flex justify-around mb-4">
-        <div>
-          <input
-            type="text"
-            placeholder="Search by TX Hash"
-            value={filterTxHash}
-            onChange={e => setFilterTxHash(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
-        <div className='flex'>
-          <DatePicker
+    <main className="container-fluid mx-auto text-black">
+      <div className='container-fluid main-banner'>
+        <h2 className='banner-header'>Transaction Bot</h2>
+      </div>
+      <ToastContainer />
+      <div className='container-fluid'>
+        <div className='row'>
+          <div className='col-md-4 mb-2'>
+            <input
+              type="text"
+              placeholder="Search by TX Hash"
+              value={filterTxHash}
+              onChange={e => setFilterTxHash(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md w-100"
+            />
+          </div>
+          <div className='col-md-4 mb-2'>
+            <DatePicker
+            showTimeSelect
+            dateFormat="MMMM d, yyyy h:mmaa"
             selected={startDate}
-            onChange={date => setStartDate(date)}
             selectsStart
             startDate={startDate}
             endDate={endDate}
-            placeholderText="Start Date"
-            className="px-4 py-2 mr-2 border border-gray-300 rounded-md"
-          />
-          <DatePicker
-            selected={endDate}
-            onChange={date => setEndDate(date)}
-            selectsEnd
-            startDate={startDate}
-            endDate={endDate}
-            minDate={startDate}
-            placeholderText="End Date"
-            className="px-4 py-2 border border-gray-300 rounded-md"
-          />
-          <button onClick={clearDateSelection} className="px-4 py-2 ml-2 text-white bg-red-500 rounded-md">Clear Dates</button>
+            onChange={date => setStartDate(date)}
+            placeholderText="Start Date & Time"
+            className="px-4 py-2 mr-2 border border-gray-300 rounded-md w-100"
+            />
+          </div>
+          <div className='col-md-4 mb-2'>
+            <DatePicker
+              showTimeSelect
+              dateFormat="MMMM d, yyyy h:mmaa"
+              selected={endDate}
+              onChange={date => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              placeholderText="End Date & Time"
+              className="px-4 py-2 border border-gray-300 rounded-md w-100"
+            />
+          </div>
         </div>
-        <div>
-          <select
-            value={sortedField}
-            onChange={e => setSortedField(e.target.value)}
-            className="px-4 py-2 ml-4 border border-gray-300 rounded-md"
-          >
-            <option value="">Sort By</option>
-            <option value="txHash">TX Hash</option>
-            <option value="time">Time</option>
-            {/* Add more options as needed */}
-          </select>
-          <select
-            value={sortOrder}
-            onChange={e => setSortOrder(e.target.value)}
-            className="px-4 py-2 ml-4 border border-gray-300 rounded-md"
-          >
-            <option value="asc">Ascending</option>
-            <option value="desc">Descending</option>
-          </select>
+        <div className='row'>
+          <div className='col-md-3 mb-2'>
+            <input
+              type="text"
+              placeholder="Search by Contract Address"
+              value={filterTxHash}
+              onChange={e => setFilterTxHash(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md w-100"
+            />
+          </div>
+          <div className='col-md-3 mb-2'>
+            <select
+              value={sortedField}
+              onChange={e => setSortedField(e.target.value)}
+              className="py-2 border border-gray-300 rounded-md w-100"
+            >
+              <option value="">Sort By</option>
+              <option value="txHash">TX Hash</option>
+              <option value="time">Time</option>
+              {/* Add more options as needed */}
+            </select>
+          </div>
+          <div className='col-md-3 mb-2'>
+            <select
+              value={sortOrder}
+              onChange={e => setSortOrder(e.target.value)}
+              className="py-2 border border-gray-300 rounded-md w-100"
+            >
+              <option value="asc">Ascending</option>
+              <option value="desc">Descending</option>
+            </select>
+          </div>
+          <div className='col-md-3 mb-2'>
+            <button onClick={clearSelections} className="py-2 w-100 text-white bg-clr rounded-md">Clear</button>
+          </div>
+        </div>
+        <div className='row table-responsive'>
+          <table className="table table-hover table-record">
+            <thead>
+              <tr>
+                <th className="">TX Hash</th>
+                <th className="">Contract Address</th>
+                <th className="">To Address</th>
+                <th className="">From Address</th>
+                <th className="">Time</th>
+                <th className="">Gas Fee</th>
+                <th className="">Value</th>
+                <th className="">Action</th>
+              </tr>
+            </thead>
+            <tbody className="">
+              {filterTransactions().map((tx, index) => (
+                <tr key={index}>
+                  <td className="">
+                    {tx.txHash.slice(0, 4)}...{tx.txHash.slice(38,42)} 
+                    <button onClick={() => copyToClipboard(tx.txHash)}><BsCopy className='inline-icon' /></button>
+
+                    
+                     <a href= {`https://etherscan.io/tx/${tx.txHash}`} target='_BLANK'><BsBoxArrowUpRight className='inline-icon' /></a>
+                  </td>
+                  <td className="">{tx.toAddress.slice(0, 15)}</td>
+                  <td className="">{tx.toAddress.slice(0, 15)}</td>
+                  <td className="">{tx.fromAddress.slice(0, 15)}</td>
+                  <td className="">{tx.time}</td>
+                  <td className="">${tx.gasFee}</td>
+                  <td className="">${tx.value}</td>
+                  <td className="">
+                    <button
+                      onClick={() => handleActionClick(tx)}
+                      className="text-blue-500 underline cursor-pointer"
+                    >
+                      <Image src="/assets/images/view.png" alt='Icon' width={20} height={20} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
-
-      {/* Transaction table */}
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead>
-          <tr>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">TX Hash</th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">To Address</th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">From Address</th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Time</th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Gas Fee</th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Value</th>
-            <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Action</th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {filterTransactions().map((tx, index) => (
-            <tr key={index}>
-              <td className="px-6 py-4 whitespace-nowrap">{tx.txHash.slice(0, 15)}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{tx.toAddress.slice(0, 15)}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{tx.fromAddress.slice(0, 15)}</td>
-              <td className="px-6 py-4 whitespace-nowrap">{tx.time}</td>
-              <td className="px-6 py-4 whitespace-nowrap">${tx.gasFee}</td>
-              <td className="px-6 py-4 whitespace-nowrap">${tx.value}</td>
-              <td className="px-6 py-4 whitespace-nowrap">
-                <button
-                  onClick={() => handleActionClick(tx)}
-                  className="text-blue-500 underline cursor-pointer"
-                >
-                  <Image src="/assets/images/view.png" alt='Icon' width={25} height={25} />
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
       {/* Modal */}
       {isModalOpen && (
@@ -180,7 +233,7 @@ export default function Home() {
             <p><strong>Time:</strong> {selectedTransaction.time}</p>
             <p><strong>Gas Fee:</strong> ${selectedTransaction.gasFee}</p>
             <p><strong>Value:</strong> ${selectedTransaction.value}</p>
-            <button onClick={closeModal} className="px-4 py-2 mt-4 text-white bg-blue-500 rounded-md">Close</button>
+            <button onClick={closeModal} className="px-4 py-2 mt-4 text-white bg-clr rounded-md">Close</button>
           </div>
         </div>
       )}
