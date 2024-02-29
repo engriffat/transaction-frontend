@@ -34,15 +34,23 @@ const transactions = [
   { txHash: '0xB7F4b41De88fEC1Fb179f2eD06C4E1B3457aB3A1', toAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', fromAddress: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4', time: '2024-02-17 21:00:00', gasFee: 0.001234, value: 0.5678, action: 'receive' },
 ];
 
+const contractAddresses = [
+  { address: 'A7863443FF'},
+  { address: 'B7863443FF'},
+  { address: 'C7863443FF'}
+];
+
 export default function Home() {
   const [sortedField, setSortedField] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
   const [filterTxHash, setFilterTxHash] = useState('');
   const [filterTime, setFilterTime] = useState('');
   const [selectedTransaction, setSelectedTransaction] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [isModalOpen1, setIsModalOpen1] = useState(false);
+  const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [SelectedcontractAddress, setcontractAddress] = useState("");
 
   // Sorting function
   const sortedTransactions = [...transactions].sort((a, b) => {
@@ -68,7 +76,21 @@ export default function Home() {
   // Function to handle click on action (Open modal)
   const handleActionClick = (transaction) => {
     setSelectedTransaction(transaction);
-    setIsModalOpen(true);
+    setIsModalOpen1(true);
+  };
+
+  // Function to open add contract modal
+  const openContractModal =()=>{
+    setIsModalOpen2(true);
+  };
+
+  // Function to close the modal
+  const closeModal = () => {
+    setIsModalOpen1(false);
+  };
+
+  const closeContractModal = () => {
+    setIsModalOpen2(false);
   };
 
   // Function to clear date selection
@@ -78,11 +100,7 @@ export default function Home() {
     setEndDate(null);
     setSortOrder("");
     setSortedField("");
-  };
-
-  // Function to close the modal
-  const closeModal = () => {
-    setIsModalOpen(false);
+  setcontractAddress("");
   };
 
   // const [isCopied, setIsCopied] = useState(false);
@@ -95,11 +113,23 @@ export default function Home() {
     }
   };
 
+  // On selecting the contract address
+  const handleContractAddress = (value) => {
+    setcontractAddress(value);
+    console.log(SelectedcontractAddress);
+  };
+
 
   return (
     <main className="container-fluid mx-auto text-black">
       <div className='container-fluid main-banner'>
         <h2 className='banner-header'>Transaction Bot</h2>
+        <div className='row button-row'>
+          <div className='col-md-10 mb-2'></div>
+          <div className='col-md-2 mb-2'>
+            <button className='py-2 w-100 white-btn rounded-md' onClick={() => openContractModal()}>Add Contract</button>
+          </div>
+        </div>
       </div>
       <ToastContainer />
       <div className='container-fluid'>
@@ -143,13 +173,17 @@ export default function Home() {
         </div>
         <div className='row'>
           <div className='col-md-3 mb-2'>
-            <input
-              type="text"
-              placeholder="Search by Contract Address"
-              value={filterTxHash}
-              onChange={e => setFilterTxHash(e.target.value)}
+            <select
+              value={SelectedcontractAddress} 
+              onChange={e => handleContractAddress(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-md w-100"
-            />
+            >
+              <option value="" selected>Search by Contract Address</option>
+              {contractAddresses.map((key, value) => (
+               <option key={key.address} value={key.address}>
+               {key.address}</option>
+              ))}
+              </select>
           </div>
           <div className='col-md-3 mb-2'>
             <select
@@ -222,8 +256,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Modal */}
-      {isModalOpen && (
+      {/* View Detail Modal */}
+      {isModalOpen1 && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="p-8 bg-white rounded-lg">
             <h2 className="mb-4 text-lg font-semibold">Transaction Details</h2>
@@ -236,6 +270,18 @@ export default function Home() {
             <button onClick={closeModal} className="px-4 py-2 mt-4 text-white bg-clr rounded-md">Close</button>
           </div>
         </div>
+      )}
+      {/* Contract Modal */}
+      {isModalOpen2 && (
+      <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="p-8 bg-white rounded-lg">
+            <h2 className="mb-4 text-lg font-semibold">Add Contract Address</h2>
+            <form>
+              <input type='' placeholder='Enter Contract Address' className='px-4 py-2 border border-gray-300 rounded-md w-100'/>
+              <input type="submit" value="Submit" className='mt-2 py-2 w-50 text-white bg-clr rounded-md'/> <button onClick={closeContractModal} className="mt-2 px-4 py-2 mt-4 text-white bg-red rounded-md">Close</button>
+            </form>
+          </div>
+      </div>
       )}
     </main>
   );
