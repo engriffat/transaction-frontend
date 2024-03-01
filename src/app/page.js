@@ -1,7 +1,7 @@
 "use client"
 
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -9,6 +9,7 @@ import { BsCopy } from "react-icons/bs";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
 
 // Sample transaction data
 const transactions = [
@@ -34,12 +35,6 @@ const transactions = [
   { txHash: '0xB7F4b41De88fEC1Fb179f2eD06C4E1B3457aB3A1', toAddress: '0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B', fromAddress: '0x5B38Da6a701c568545dCfcB03FcB875f56beddC4', time: '2024-02-17 21:00:00', gasFee: 0.001234, value: 0.5678, action: 'receive' },
 ];
 
-const contractAddresses = [
-  { address: 'A7863443FF'},
-  { address: 'B7863443FF'},
-  { address: 'C7863443FF'}
-];
-
 export default function Home() {
   const [sortedField, setSortedField] = useState(null);
   const [sortOrder, setSortOrder] = useState('asc');
@@ -50,6 +45,7 @@ export default function Home() {
   const [endDate, setEndDate] = useState(null);
   const [isModalOpen1, setIsModalOpen1] = useState(false);
   const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [allContractAddresses, setallContractAddresses] = useState([]);
   const [SelectedcontractAddress, setcontractAddress] = useState("");
 
   // Sorting function
@@ -119,6 +115,23 @@ export default function Home() {
     console.log(SelectedcontractAddress);
   };
 
+  // get all contract address from Api
+  useEffect(() => {
+    const fetchData = async () => {
+      const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      // console.log(apiUrl);
+      try {
+        const response = await fetch(`${apiUrl}/api/getContract`);
+        const result = await response.json();
+        const addresses = result.data.map(item => item.contract_address);
+        setallContractAddresses(addresses);
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
+      }
+    };
+    fetchData();
+  }, []);
+
 
   return (
     <main className="container-fluid mx-auto text-black">
@@ -179,9 +192,9 @@ export default function Home() {
               className="px-4 py-2 border border-gray-300 rounded-md w-100"
             >
               <option value="" selected>Search by Contract Address</option>
-              {contractAddresses.map((key, value) => (
-               <option key={key.address} value={key.address}>
-               {key.address}</option>
+              {allContractAddresses.map((key, value) => (
+               <option key={key} value={key}>
+               {key}</option>
               ))}
               </select>
           </div>
