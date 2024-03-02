@@ -231,7 +231,7 @@ export default function Home() {
               ))}
             </select>
           </div>
-          <div className='mb-2 col-md-2'>
+          {/* <div className='mb-2 col-md-2'>
             <select
               value={sortedField}
               onChange={e => setSortedField(e.target.value)}
@@ -240,10 +240,9 @@ export default function Home() {
               <option value="">Sort By</option>
               <option value="txHash">TX Hash</option>
               <option value="time">Time</option>
-              {/* Add more options as needed */}
             </select>
-          </div>
-          <div className='mb-2 col-md-2'>
+          </div> */}
+          {/* <div className='mb-2 col-md-2'>
             <select
               value={sortOrder}
               onChange={e => setSortOrder(e.target.value)}
@@ -252,7 +251,7 @@ export default function Home() {
               <option value="asc">Ascending</option>
               <option value="desc">Descending</option>
             </select>
-          </div>
+          </div> */}
           <div className='mb-2 col-md-4'>
             <DatePicker
               showTimeSelect
@@ -292,13 +291,13 @@ export default function Home() {
           <table className="table table-hover table-record">
             <thead>
               <tr>
+                <th className="">Updated At</th>
                 <th className="">TX Hash</th>
-                <th className="">Chain ID</th>
-                <th className="">Contract Address</th>
+                <th className="">Created At</th>
+                {/* <th className="">Chain ID</th> */}
+                {/* <th className="">Contract Address</th> */}
                 <th className="">From Address</th>
                 <th className="">To Address</th>
-                <th className="">Created At</th>
-                <th className="">Updated At</th>
                 <th className="">Gas Fee</th>
                 <th className="">Value</th>
                 <th className="">Action</th>
@@ -307,19 +306,25 @@ export default function Home() {
             <tbody className="">
               {transactions?.map((tx, index) => (
                 <tr key={index}>
+                  <td className="">{tx.updatedAt}</td>
                   <td className="">
                     {tx.transaction_hash.slice(0, 4)}...{tx.transaction_hash.slice(38, 42)}
-                    <button onClick={() => copyToClipboard(tx.transaction_hash)}><BsCopy className='inline-icon' /></button>
-
-
+                    <button className='mx-2' onClick={() => copyToClipboard(tx.transaction_hash)}><BsCopy className='inline-icon' /></button>
                     <a href={`https://etherscan.io/tx/${tx.transaction_hash}`} target='_BLANK'><BsBoxArrowUpRight className='inline-icon' /></a>
                   </td>
-                  <td className="">{tx.chain_id}</td>
-                  <td className="">{tx.contract_address.slice(0, 15) || "No Contract Address"}</td>
-                  <td className="">{tx.from_address.slice(0, 15)}</td>
-                  <td className="">{tx.to_address.slice(0, 15)}</td>
                   <td className="">{tx.createdAt}</td>
-                  <td className="">{tx.updatedAt}</td>
+                  {/* <td className="">{tx.chain_id}</td> */}
+                  {/* <td className="">{tx.contract_address.slice(0, 15) || "No Contract Address"}</td> */}
+                  <td className="">
+                    {/* {tx.from_address.slice(0, 15)} */}
+                    {tx.from_address.slice(0, 4)}...{tx.from_address.slice(38, 42)}
+                    <button className='mx-2' onClick={() => copyToClipboard(tx.from_address)}><BsCopy className='inline-icon' /></button>
+                  </td>
+                  <td className="">
+                    {/* {tx.to_address.slice(0, 15)} */}
+                    {tx.to_address.slice(0, 4)}...{tx.to_address.slice(38, 42)}
+                    <button className='mx-2' onClick={() => copyToClipboard(tx.to_address)}><BsCopy className='inline-icon' /></button>
+                  </td>
                   <td className="">${tx.gas}</td>
                   <td className="">${tx.value}</td>
                   <td className="">
@@ -332,25 +337,25 @@ export default function Home() {
                   </td>
                 </tr>
               ))}
-              <div>
-                <div>
-                  <span>Show </span>
-                  <select value={pageSize} onChange={handleFieldChange}>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                  </select>
-                  <span> entries</span>
-                </div>
-                <div className='flex gap-5'>
-                  <button className='cursor-pointer' onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
-                  <span>{page}</span>
-                  <button className='cursor-pointer' onClick={() => handlePageChange(page + 1)} disabled={page === Math.ceil(totalItems / pageSize)}>Next</button>
-                </div>
-              </div>
             </tbody>
           </table>
+          <div className='tbl-pagination-wrapper'>
+            <div className='pagination-limit-wrapper'>
+              <span>Show </span>
+              <select value={pageSize} onChange={handleFieldChange}>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+              <span> entries</span>
+            </div>
+            <div className='flex gap-5'>
+              <button className='cursor-pointer' onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
+              <span>{page}</span>
+              <button className='cursor-pointer' onClick={() => handlePageChange(page + 1)} disabled={page === Math.ceil(totalItems / pageSize)}>Next</button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -359,7 +364,8 @@ export default function Home() {
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="p-8 bg-white rounded-lg">
             <h2 className="mb-4 text-lg font-semibold">Transaction Details</h2>
-            <p><strong>TX Hash:</strong> {selectedTransaction.transaction_hash}</p>
+            <p>Volume detail etc comming soon</p>
+            {/* <p><strong>TX Hash:</strong> {selectedTransaction.transaction_hash}</p>
             <p><strong>Chain ID:</strong> {selectedTransaction.chain_id}</p>
             <p><strong>Contract Address:</strong> {selectedTransaction.contract_address || "No Contract Address"}</p>
             <p><strong>From Address:</strong> {selectedTransaction.from_address}</p>
@@ -367,7 +373,7 @@ export default function Home() {
             <p><strong>Created At:</strong> {selectedTransaction.createdAt}</p>
             <p><strong>Updated At:</strong> {selectedTransaction.updatedAt}</p>
             <p><strong>Gas Fee:</strong> ${selectedTransaction.gas}</p>
-            <p><strong>Value:</strong> ${selectedTransaction.value}</p>
+            <p><strong>Value:</strong> ${selectedTransaction.value}</p> */}
             <button onClick={closeModal} className="px-4 py-2 mt-4 text-white rounded-md bg-clr">Close</button>
           </div>
         </div>
