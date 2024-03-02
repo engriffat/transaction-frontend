@@ -18,13 +18,10 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
+  background: linear-gradient(to bottom,
       transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-    background-repeat: no-repeat;
+      rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
+  background-repeat: no-repeat;
 }
 
 @layer utilities {
@@ -32,12 +29,14 @@ body {
     text-wrap: balance;
   }
 }
+
 /* Custom css by iffat*/
-.main-banner{
- background: rgb(7, 121, 144);
- padding-top: 40px;
+.main-banner {
+  background: rgb(7, 121, 144);
+  padding-top: 40px;
 }
-.banner-header{
+
+.banner-header {
   color: white;
   font-size: 25px;
   text-transform: uppercase;
@@ -46,32 +45,59 @@ body {
   font-family: sans-serif;
   text-align: center;
 }
-.bg-clr{
+
+.bg-clr {
   background: rgb(7, 121, 144);
 }
-.table-record td, .table-record th{
+
+.table-record td,
+.table-record th {
   padding-top: 15px !important;
   padding-bottom: 15px !important;
   font-size: 14px;
 }
-.react-datepicker-wrapper{
+
+.react-datepicker-wrapper {
   width: 100%;
 }
-.inline-icon{
+
+.inline-icon {
   display: inline;
   cursor: pointer;
   padding-left: 2px;
   padding-right: 2px;
   font-size: 17px;
 }
-.bg-red{
+
+.bg-red {
   background-color: red;
 }
-.white-btn{
+
+.white-btn {
   background-color: white;
   color: black;
 }
-.button-row{
+
+.button-row {
   padding-bottom: 20px;
   margin-bottom: 20px;
 }
+
+
+
+/* pagination & table pages css  */
+
+.tbl-pagination-wrapper {
+  display: flex;
+  padding: 10px 10px;
+  align-items: center;
+  background-color: white;
+  justify-content: space-between;
+}
+
+.pagination-limit-wrapper select {
+  background-color: black;
+  color: white;
+}
+
+/* pagination & table pages css  */
