@@ -106,7 +106,7 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       // const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const apiUrl = "http://localhost:3003";
+      const apiUrl = "http://44.221.66.45:3003";
       // console.log(apiUrl);
       try {
         const response = await fetch(`${apiUrl}/api/getContract`);
@@ -121,7 +121,7 @@ export default function Home() {
   }, []);
 
   const getTransactions = async () => {
-    const apiUrl = "http://localhost:3003";
+    const apiUrl = "http://44.221.66.45:3003";
     try {
       const response = await fetch(`${apiUrl}/api/getTransaction`, {
         method: 'POST',
@@ -158,7 +158,7 @@ export default function Home() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://localhost:3003/api/addContract', {
+      const response = await fetch('http://44.221.66.45:3003/api/addContract', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
