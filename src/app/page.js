@@ -9,6 +9,7 @@ import { BsCopy } from "react-icons/bs";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { BsArrowRightSquareFill } from "react-icons/bs";
 
 export default function Home() {
   const [transactions, setTransactions] = useState([]);
@@ -197,62 +198,10 @@ export default function Home() {
 
   return (
     <main className="mx-auto text-black container-fluid">
-      <div className='container-fluid main-banner'>
-        <h2 className='banner-header'>Transaction Bot</h2>
-        <div className='row button-row'>
-          <div className='mb-2 col-md-10'></div>
-          <div className='mb-2 col-md-2'>
-            <button className='py-2 rounded-md w-100 white-btn' onClick={() => openContractModal()}>Add Contract</button>
-          </div>
-        </div>
-      </div>
       <ToastContainer />
-      <div className='container-fluid'>
+      <div className='container mt-2 filter-box'>
         <div className='row'>
-          <div className='mb-2 col-md-4'>
-            <input
-              type="text"
-              placeholder="Search by TX Hash"
-              value={filterTxHash}
-              onChange={e => setFilterTxHash(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-md w-100"
-            />
-          </div>
-          <div className='mb-2 col-md-4'>
-            <select
-              value={SelectedcontractAddress}
-              onChange={e => handleContractAddress(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-md w-100"
-            >
-              <option value="" selected>Search by Contract Address</option>
-              {allContractAddresses.map((key, value) => (
-                <option key={key} value={key}>
-                  {key}</option>
-              ))}
-            </select>
-          </div>
-          {/* <div className='mb-2 col-md-2'>
-            <select
-              value={sortedField}
-              onChange={e => setSortedField(e.target.value)}
-              className="py-2 border border-gray-300 rounded-md w-100"
-            >
-              <option value="">Sort By</option>
-              <option value="txHash">TX Hash</option>
-              <option value="time">Time</option>
-            </select>
-          </div> */}
-          {/* <div className='mb-2 col-md-2'>
-            <select
-              value={sortOrder}
-              onChange={e => setSortOrder(e.target.value)}
-              className="py-2 border border-gray-300 rounded-md w-100"
-            >
-              <option value="asc">Ascending</option>
-              <option value="desc">Descending</option>
-            </select>
-          </div> */}
-          <div className='mb-2 col-md-4'>
+          <div className='mb-2 col-md-6'>
             <DatePicker
               showTimeSelect
               dateFormat="MMMM d, yyyy h:mmaa"
@@ -262,10 +211,21 @@ export default function Home() {
               endDate={endDate}
               onChange={date => setStartDate(date)}
               placeholderText="Start Date & Time"
-              className="px-4 py-2 mr-2 border border-gray-300 rounded-md w-100"
+              className="mb-2 px-4 py-2 mr-2 border border-gray-300 rounded-md w-100"
             />
           </div>
-          <div className='mb-2 col-md-4'>
+          <div className='mb-2 col-md-6'>
+            <input
+              type="text"
+              placeholder="Search by TX Hash"
+              value={filterTxHash}
+              onChange={e => setFilterTxHash(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md w-100"
+            />
+          </div>
+        </div>
+        <div className='row'>
+          <div className='mb-2 col-md-6'>
             <DatePicker
               showTimeSelect
               dateFormat="MMMM d, yyyy h:mmaa"
@@ -279,93 +239,98 @@ export default function Home() {
               className="px-4 py-2 border border-gray-300 rounded-md w-100"
             />
           </div>
-          <div className='mb-2 col-md-2'>
-            <button onClick={handleSearch} className="py-2 text-white rounded-md w-100 bg-clr">Search</button>
-          </div>
-          <div className='mb-2 col-md-2'>
-            <button onClick={clearSelections} className="py-2 text-white rounded-md w-100 bg-clr">Clear</button>
+          <div className='mb-2 col-md-6'>
+            <select
+                value={SelectedcontractAddress}
+                onChange={e => handleContractAddress(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-md w-100"
+              >
+                <option value="" selected>Search by Contract Address</option>
+                {allContractAddresses.map((key, value) => (
+                  <option key={key} value={key}>
+                    {key}</option>
+                ))}
+              </select>
           </div>
         </div>
-
-        <div className='row table-responsive'>
-          <table className="table table-hover table-record">
-            <thead>
-              <tr>
-                <th className="">Updated At</th>
-                <th className="">TX Hash</th>
-                <th className="">Created At</th>
-                {/* <th className="">Chain ID</th> */}
-                {/* <th className="">Contract Address</th> */}
-                <th className="">From Address</th>
-                <th className="">To Address</th>
-                <th className="">Gas Fee</th>
-                <th className="">Value</th>
-                <th className="">Action</th>
-              </tr>
-            </thead>
-            <tbody className="">
-              {transactions?.map((tx, index) => (
-                <tr key={index}>
-                  <td className="">{tx.updatedAt}</td>
-                  <td className="">
-                    {tx.transaction_hash.slice(0, 4)}...{tx.transaction_hash.slice(38, 42)}
-                    <button className='mx-2' onClick={() => copyToClipboard(tx.transaction_hash)}><BsCopy className='inline-icon' /></button>
-                    <a href={`https://etherscan.io/tx/${tx.transaction_hash}`} target='_BLANK'><BsBoxArrowUpRight className='inline-icon' /></a>
-                  </td>
-                  <td className="">{tx.createdAt}</td>
-                  {/* <td className="">{tx.chain_id}</td> */}
-                  {/* <td className="">{tx.contract_address.slice(0, 15) || "No Contract Address"}</td> */}
-                  <td className="">
-                    {/* {tx.from_address.slice(0, 15)} */}
-                    {tx.from_address.slice(0, 4)}...{tx.from_address.slice(38, 42)}
-                    <button className='mx-2' onClick={() => copyToClipboard(tx.from_address)}><BsCopy className='inline-icon' /></button>
-                  </td>
-                  <td className="">
-                    {/* {tx.to_address.slice(0, 15)} */}
-                    {tx.to_address.slice(0, 4)}...{tx.to_address.slice(38, 42)}
-                    <button className='mx-2' onClick={() => copyToClipboard(tx.to_address)}><BsCopy className='inline-icon' /></button>
-                  </td>
-                  <td className="">${tx.gas}</td>
-                  <td className="">${tx.value}</td>
-                  <td className="">
-                    <button
-                      onClick={() => handleActionClick(tx)}
-                      className="text-blue-500 underline cursor-pointer"
-                    >
-                      <Image src="/assets/images/view.png" alt='Icon' width={20} height={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className='tbl-pagination-wrapper'>
-            <div className='pagination-limit-wrapper'>
-              <span>Show </span>
-              <select value={pageSize} onChange={handleFieldChange}>
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
-              </select>
-              <span> entries</span>
-            </div>
-            <div className='flex gap-5'>
-              <button className='cursor-pointer' onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
-              <span>{page}</span>
-              <button className='cursor-pointer' onClick={() => handlePageChange(page + 1)} disabled={page === Math.ceil(totalItems / pageSize)}>Next</button>
-            </div>
+        <div className='row mt-2'>
+          <div className='mb-2 col-md-4'></div>
+          <div className='mb-2 col-md-4 text-center'>
+            <button onClick={handleSearch} className="mr-2 btn btn-primary white-btn">Apply Filters</button>
+            <button onClick={clearSelections} className="btn btn-primary white-btn">Clear</button>
           </div>
+          <div className='mb-2 col-md-4'></div>
         </div>
       </div>
-
-      {/* View Detail Modal */}
+ 
+      <div className='container mt-4'>
+        <div className='row table-responsive'>
+        {transactions?.map((tx, index) => (
+          <div className='col-md-3'>
+            <div class="card mb-2">
+              <h6 className='card-title text-center'>
+                {tx.transaction_hash.slice(0, 6)}...{tx.transaction_hash.slice(35, 42)}
+                <button className='mx-2' onClick={() => copyToClipboard(tx.transaction_hash)}><BsCopy className='inline-icon' /></button>
+                <a href={`https://etherscan.io/tx/${tx.transaction_hash}`} target='_BLANK'><BsBoxArrowUpRight className='inline-icon' /></a>
+              </h6>
+              <div class="card-body">
+                <table class="table-data table">
+                  <tr>
+                    <th>Buy Volume</th>
+                    <td>3.5 $</td>
+                  </tr>
+                  <tr>
+                    <th>Sell Volume</th>
+                    <td>3.5 $</td>
+                  </tr>
+                  <tr>
+                    <th>Net Volume</th>
+                    <td>3.66$</td>
+                  </tr>
+                  <tr>
+                    <th>From Address</th>
+                    <td>
+                      {tx.from_address.slice(0, 4)}...{tx.from_address.slice(38, 42)}
+                      <a className='arrow-link' onClick={() => copyToClipboard(tx.from_address)}><BsCopy className='inline-icon' /></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>To Address</th>
+                    <td>
+                      {tx.to_address.slice(0, 4)}...{tx.to_address.slice(38, 42)}
+                      <a className='arrow-link' onClick={() => copyToClipboard(tx.to_address)}><BsCopy className='inline-icon' /></a>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th>Gass Fee</th>
+                    <td>{tx.gas}$</td>
+                  </tr>
+                  <tr>
+                    <th>Transaction Value</th>
+                    <td>${tx.value}</td>
+                  </tr>
+                  <tr>
+                    <td></td>
+                    <td className='text-right'>
+                      <a onClick={() => handleActionClick(tx)} className='arrow-link'><BsArrowRightSquareFill  className='inline-icon arrow-icon'/></a>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </div>
+          </div>
+          ))}
+        </div>
+        <div className='row text-center mt-2 mb-4'>
+          <button className='btn btn-primary load-more-btn'>Load More</button>
+        </div>
+      </div>
+      {/* View Details Modal */}
       {isModalOpen1 && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="p-8 bg-white rounded-lg">
             <h2 className="mb-4 text-lg font-semibold">Transaction Details</h2>
-            <p>Volume detail etc comming soon</p>
-            {/* <p><strong>TX Hash:</strong> {selectedTransaction.transaction_hash}</p>
+            <p><strong>TX Hash:</strong> {selectedTransaction.transaction_hash}</p>
             <p><strong>Chain ID:</strong> {selectedTransaction.chain_id}</p>
             <p><strong>Contract Address:</strong> {selectedTransaction.contract_address || "No Contract Address"}</p>
             <p><strong>From Address:</strong> {selectedTransaction.from_address}</p>
@@ -373,8 +338,8 @@ export default function Home() {
             <p><strong>Created At:</strong> {selectedTransaction.createdAt}</p>
             <p><strong>Updated At:</strong> {selectedTransaction.updatedAt}</p>
             <p><strong>Gas Fee:</strong> ${selectedTransaction.gas}</p>
-            <p><strong>Value:</strong> ${selectedTransaction.value}</p> */}
-            <button onClick={closeModal} className="px-4 py-2 mt-4 text-white rounded-md bg-clr">Close</button>
+            <p><strong>Value:</strong> ${selectedTransaction.value}</p>
+            <button onClick={closeModal} className="px-4 py-2 mt-4 rounded-md load-more-btn">Close</button>
           </div>
         </div>
       )}

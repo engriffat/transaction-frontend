@@ -46,8 +46,10 @@ body {
   text-align: center;
 }
 
-.bg-clr {
-  background: rgb(7, 121, 144);
+.load-more-btn {
+  background-color: rgb(7, 121, 144) !important;
+  width: 15% !important;
+  margin: auto;
 }
 
 .table-record td,
@@ -101,3 +103,44 @@ body {
 }
 
 /* pagination & table pages css  */
+
+.filter-box{
+  padding-top: 35px;
+  background: #077990;
+  padding-bottom: 20px
+}
+.white-btn{
+  background-color: white !important;
+  color: black !important;
+  font-size: 12px !important;
+  text-transform: uppercase;
+}
+.table-header>th{
+  background-color: #077990 !important;
+}
+.table-data td{
+  font-size: 13px;
+  padding-bottom: 5px;
+  text-align: right;
+}
+.table-data th {
+  font-size: 13px;
+  font-weight: normal;
+  padding-bottom: 5px;
+}
+.arrow-icon{
+  font-size: 22px;
+  color: #077990;
+}
+.arrow-link{
+  border-bottom: none;
+}
+.card-body {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+.card-title{
+  border-bottom: 1px solid #d2d2d2;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
