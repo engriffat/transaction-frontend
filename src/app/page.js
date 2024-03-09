@@ -1,23 +1,42 @@
-"use client"
+"use client";
 
-import Image from 'next/image';
-import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import 'bootstrap/dist/css/bootstrap.css';
+import Image from "next/image";
+import React, { useState, useEffect } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import "bootstrap/dist/css/bootstrap.css";
 import { BsCopy } from "react-icons/bs";
 import { BsBoxArrowUpRight } from "react-icons/bs";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { BsArrowRightSquareFill } from "react-icons/bs";
+
+const tableHeaders = [
+  // "ID",
+  "To Address",
+  "From Address",
+  "Gas",
+  "Value",
+  "Chain ID",
+  "Status",
+  "Max Fee Per Gas",
+  "Nonce",
+  "Type",
+  "Transaction Hash",
+  "Created At",
+  "Updated At",
+];
 
 export default function Home() {
   const [transactions, setTransactions] = useState([]);
+  const [calculation, setCalculations] = useState([]);
+
   const totalItems = transactions.length;
+
   const [sortedField, setSortedField] = useState(null);
-  const [sortOrder, setSortOrder] = useState('asc');
-  const [filterTxHash, setFilterTxHash] = useState('');
-  const [filterTime, setFilterTime] = useState('');
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [filterTxHash, setFilterTxHash] = useState("");
+  const [filterTime, setFilterTime] = useState("");
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -25,33 +44,34 @@ export default function Home() {
   const [isModalOpen2, setIsModalOpen2] = useState(false);
   const [allContractAddresses, setallContractAddresses] = useState([]);
   const [SelectedcontractAddress, setcontractAddress] = useState("");
-  const [contractAddress, setContractAddress] = useState('');
+  const [contractAddress, setContractAddress] = useState("");
   const [page, setPage] = useState(1);
-  console.log("🚀 ~ Home ~ page:", page)
   const [pageSize, setPageSize] = useState(10);
+
+  const [contractKey, setContactkey] = useState("");
 
   // Sorting function
   const sortedTransactions = [...transactions].sort((a, b) => {
     if (sortedField) {
       const compareResult = a[sortedField].localeCompare(b[sortedField]);
-      return sortOrder === 'asc' ? compareResult : -compareResult;
+      return sortOrder === "asc" ? compareResult : -compareResult;
     }
     return 0;
   });
 
   // Filtering function
-  const filterTransactions = () => {
-    return sortedTransactions.filter(tx => {
-      const txDate = new Date(tx.createdAt); // Assuming createdAt is the property containing transaction time
-      const isWithinDateRange =
-        (!startDate || txDate >= startDate) &&
-        (!endDate || txDate <= endDate);
-      const matchesTxHash = tx.transaction_hash.includes(filterTxHash);
-      const matchesContractAddress = SelectedcontractAddress === "" || tx.contract_address.includes(SelectedcontractAddress);
-      return isWithinDateRange && matchesTxHash && matchesContractAddress;
-    });
-  };
-
+  // const filterTransactions = () => {
+  //   return sortedTransactions.filter((tx) => {
+  //     const txDate = new Date(tx.createdAt); // Assuming createdAt is the property containing transaction time
+  //     const isWithinDateRange =
+  //       (!startDate || txDate >= startDate) && (!endDate || txDate <= endDate);
+  //     const matchesTxHash = tx.transaction_hash.includes(filterTxHash);
+  //     const matchesContractAddress =
+  //       SelectedcontractAddress === "" ||
+  //       tx.contract_address.includes(SelectedcontractAddress);
+  //     return isWithinDateRange && matchesTxHash && matchesContractAddress;
+  //   });
+  // };
 
   // Function to handle click on action (Open modal)
   const handleActionClick = (transaction) => {
@@ -60,9 +80,9 @@ export default function Home() {
   };
 
   // Function to open add contract modal
-  const openContractModal = () => {
-    setIsModalOpen2(true);
-  };
+  // const openContractModal = () => {
+  //   setIsModalOpen2(true);
+  // };
 
   // Function to close the modal
   const closeModal = () => {
@@ -87,9 +107,9 @@ export default function Home() {
   const copyToClipboard = async (textToCopy) => {
     try {
       await navigator.clipboard.writeText(textToCopy);
-      toast.success('Copied!');
+      toast.success("Copied!");
     } catch (err) {
-      console.error('Unable to copy to clipboard.', err);
+      console.error("Unable to copy to clipboard.", err);
     }
   };
 
@@ -108,100 +128,324 @@ export default function Home() {
     const fetchData = async () => {
       // const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
       const apiUrl = "http://44.221.66.45:3003";
-      // console.log(apiUrl);
       try {
         const response = await fetch(`${apiUrl}/api/getContract`);
         const result = await response.json();
-        const addresses = result.data.map(item => item.contract_address);
+        const addresses = result.data.map((item) => item.contract_address);
         setallContractAddresses(addresses);
       } catch (error) {
-        console.error('Error fetching addresses:', error);
+        console.error("Error fetching addresses:", error);
       }
     };
     fetchData();
   }, []);
 
   const getTransactions = async () => {
-    const apiUrl = "http://44.221.66.45:3003";
+    // const apiUrl = "http://44.221.66.45:3003";
+    const apiUrl = "http://localhost:3003";
     try {
       const response = await fetch(`${apiUrl}/api/getTransaction`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          contract_address: "",
-          // from_date:,
-          // to_date:,
-          sorting: "",
-          sorting_field: "",
-          trx_hash: filterTxHash,
+          contract_address: contractKey || "",
+          from_date: startDate || "",
+          to_date: endDate || "",
           limit: pageSize,
           page_number: page,
-        })
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch transaction data');
+        throw new Error("Failed to fetch transaction data");
       }
 
       const data = await response.json();
-      setTransactions(data.data); // Assuming the transaction data is returned as an array
+      setTransactions(data.data);
+      setCalculations(data.calculation);
     } catch (error) {
-      console.error('Error fetching transaction data:', error);
+      console.error("Error fetching transaction data:", error);
     }
   };
 
   useEffect(() => {
     getTransactions();
-  }, [pageSize, page]); // Empty dependency array means this effect runs once after the initial render
+  }, [pageSize, page, contractKey]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch('http://44.221.66.45:3003/api/addContract', {
-        method: 'POST',
+      const response = await fetch("http://44.221.66.45:3003/api/addContract", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          contract_address: contractAddress
-        })
+          contract_address: contractAddress,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add contract address');
+        throw new Error("Failed to add contract address");
       }
 
       const data = await response.json();
       toast.success(data.Message); // Show success message
-      setContractAddress(''); // Clear input field
+      setContractAddress(""); // Clear input field
       setIsModalOpen2(false); // Close modal
     } catch (error) {
-      toast.error('Error adding contract address:', error);
+      toast.error("Error adding contract address:", error);
       // Handle error appropriately (show error message, etc.)
     }
   };
 
   const handleSearch = () => {
     getTransactions();
-  }
-
-  const handleFieldChange = (e) => {
-    setPageSize(parseInt(e.target.value, 10));
-    setPage(1);
   };
 
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-  };
+  // const handleFieldChange = (e) => {
+  //   setPageSize(parseInt(e.target.value, 10));
+  //   setPage(1);
+  // };
+
+  // const handlePageChange = (newPage) => {
+  //   setPage(newPage);
+  // };
 
   return (
-    <main className="mx-auto text-black container-fluid">
+    <main className="mx-auto text-black container-fluid h-screen !bg-white">
       <ToastContainer />
-      <div className='container mt-2 filter-box'>
-        <div className='row'>
-          <div className='mb-2 col-md-6'>
+
+      <div className="flex flex-col gap-3 bg-[#fafafa] h-full">
+        <div className="flex  gap-2 justify-center items-center w-[850px] mt-4 bg-white rounded shadow-sm p-2">
+          <DatePicker
+            showTimeSelect
+            dateFormat="MMMM d, yyyy h:mmaa"
+            selected={startDate}
+            selectsStart
+            startDate={startDate}
+            endDate={endDate}
+            onChange={(date) => setStartDate(date)}
+            placeholderText="Start Date & Time"
+            className=" px-4 py-2  border border-gray-300 rounded-md w-full"
+          />
+          <DatePicker
+            showTimeSelect
+            dateFormat="MMMM d, yyyy h:mmaa"
+            selected={endDate}
+            onChange={(date) => setEndDate(date)}
+            selectsEnd
+            startDate={startDate}
+            endDate={endDate}
+            minDate={startDate}
+            placeholderText="End Date & Time"
+            className="px-4 py-2 border border-gray-300 rounded-md w-full"
+          />
+
+          <div className="flex gap-2 justify-center items-center text-center w-3/5 ">
+            <button
+              onClick={handleSearch}
+              className="btn btn-primary white-btn"
+            >
+              Apply Filters
+            </button>
+            <button
+              onClick={clearSelections}
+              className="btn btn-primary white-btn"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div className="flex  gap-2 w-full h-full mb-4">
+          {/* Left Side */}
+          <div className="border w-[40%] flex flex-col gap-2 bg-[#ffff] p-2 rounded shadow ">
+            {allContractAddresses.length > 0 ? (
+              allContractAddresses.map((key, value) => (
+                <div
+                  key={value}
+                  className="bg-[#fafafa] p-2 rounded shadow-sm cursor-pointer truncate hover:text-white hover:bg-[#0a0a0a]"
+                  value={key}
+                  onClick={() => setContactkey(key)}
+                >
+                  {key}
+                </div>
+              ))
+            ) : (
+              <div className="flex justify-center items-center h-full w-full">
+                No Data to Display
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT side */}
+          <div className="w-full h-full grid grid-cols-3  gap-2">
+            <div className="w-full h-full col-span-2 border border-[#fafafa] rounded p-2 shawdow bg-white overflow-auto">
+              {transactions.length > 0 ? (
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      {tableHeaders.map((header) => (
+                        <th
+                          key={header}
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {transactions.map((transaction) => (
+                      <tr key={transaction._id} className="hover:bg-gray-100">
+                        {tableHeaders.map((header) => (
+                          <td
+                            key={`${transaction._id}-${header}`}
+                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                          >
+                            {
+                              transaction[
+                                header.toLowerCase().replace(" ", "_")
+                              ]
+                            }
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot>
+                    {calculation[0] && calculation[0].gas_sum && (
+                      <tr>
+                        <td
+                          colSpan="3"
+                          className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
+                        >
+                          Total:
+                        </td>
+                        <td
+                          colSpan="3"
+                          className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          {calculation[0].gas_sum}
+                        </td>
+                        <td
+                          colSpan="7"
+                          className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
+                        >
+                          {calculation[0].value_sum}
+                        </td>
+                        <td></td>
+                      </tr>
+                    )}
+                  </tfoot>
+                </table>
+              ) : (
+                <span className="text-gray-500 flex justify-center items-center h-full">
+                  No data available.
+                </span>
+              )}
+            </div>
+
+            <div className="w-full  rounded p-2 bg-[#ffff] shadow">
+              {transactions.length > 0 ? (
+                transactions?.map((tx, index) => (
+                  <div className="shadow-sm" key={index}>
+                    <div class="card mb-2">
+                      <h6 className="card-title text-center">
+                        {tx.transaction_hash.slice(0, 6)}...
+                        {tx.transaction_hash.slice(35, 42)}
+                        <button
+                          className="mx-2"
+                          onClick={() => copyToClipboard(tx.transaction_hash)}
+                        >
+                          <BsCopy className="inline-icon" />
+                        </button>
+                        <a
+                          href={`https://etherscan.io/tx/${tx.transaction_hash}`}
+                          target="_BLANK"
+                        >
+                          <BsBoxArrowUpRight className="inline-icon" />
+                        </a>
+                      </h6>
+                      <div class="card-body">
+                        <table class="table-data table">
+                          <tr>
+                            <th>Buy Volume</th>
+                            <td>3.5 $</td>
+                          </tr>
+                          <tr>
+                            <th>Sell Volume</th>
+                            <td>3.5 $</td>
+                          </tr>
+                          <tr>
+                            <th>Net Volume</th>
+                            <td>3.66$</td>
+                          </tr>
+                          <tr>
+                            <th>From Address</th>
+                            <td>
+                              {tx.from_address.slice(0, 4)}...
+                              {tx.from_address.slice(38, 42)}
+                              <a
+                                className="arrow-link"
+                                onClick={() => copyToClipboard(tx.from_address)}
+                              >
+                                <BsCopy className="inline-icon" />
+                              </a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>To Address</th>
+                            <td>
+                              {tx.to_address.slice(0, 4)}...
+                              {tx.to_address.slice(38, 42)}
+                              <a
+                                className="arrow-link"
+                                onClick={() => copyToClipboard(tx.to_address)}
+                              >
+                                <BsCopy className="inline-icon" />
+                              </a>
+                            </td>
+                          </tr>
+                          <tr>
+                            <th>Gass Fee</th>
+                            <td>{tx.gas}$</td>
+                          </tr>
+                          <tr>
+                            <th>Transaction Value</th>
+                            <td>${tx.value}</td>
+                          </tr>
+                          <tr>
+                            <td></td>
+                            <td className="text-right">
+                              <a
+                                onClick={() => handleActionClick(tx)}
+                                className="arrow-link"
+                              >
+                                <BsArrowRightSquareFill className="inline-icon arrow-icon" />
+                              </a>
+                            </td>
+                          </tr>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <span className="flex justify-center items-center h-full text-gray-500">
+                  No Data Found
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* <div className="container mt-2 filter-box">
+        <div className="row">
+          <div className="mb-2 col-md-6">
             <DatePicker
               showTimeSelect
               dateFormat="MMMM d, yyyy h:mmaa"
@@ -209,28 +453,28 @@ export default function Home() {
               selectsStart
               startDate={startDate}
               endDate={endDate}
-              onChange={date => setStartDate(date)}
+              onChange={(date) => setStartDate(date)}
               placeholderText="Start Date & Time"
               className="mb-2 px-4 py-2 mr-2 border border-gray-300 rounded-md w-100"
             />
           </div>
-          <div className='mb-2 col-md-6'>
+          <div className="mb-2 col-md-6">
             <input
               type="text"
               placeholder="Search by TX Hash"
               value={filterTxHash}
-              onChange={e => setFilterTxHash(e.target.value)}
+              onChange={(e) => setFilterTxHash(e.target.value)}
               className="px-4 py-2 border border-gray-300 rounded-md w-100"
             />
           </div>
         </div>
-        <div className='row'>
-          <div className='mb-2 col-md-6'>
+        <div className="row">
+          <div className="mb-2 col-md-6">
             <DatePicker
               showTimeSelect
               dateFormat="MMMM d, yyyy h:mmaa"
               selected={endDate}
-              onChange={date => setEndDate(date)}
+              onChange={(date) => setEndDate(date)}
               selectsEnd
               startDate={startDate}
               endDate={endDate}
@@ -239,107 +483,173 @@ export default function Home() {
               className="px-4 py-2 border border-gray-300 rounded-md w-100"
             />
           </div>
-          <div className='mb-2 col-md-6'>
+          <div className="mb-2 col-md-6">
             <select
-                value={SelectedcontractAddress}
-                onChange={e => handleContractAddress(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-md w-100"
-              >
-                <option value="" selected>Search by Contract Address</option>
-                {allContractAddresses.map((key, value) => (
-                  <option key={key} value={key}>
-                    {key}</option>
-                ))}
-              </select>
+              value={SelectedcontractAddress}
+              onChange={(e) => handleContractAddress(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-md w-100"
+            >
+              <option value="" selected>
+                Search by Contract Address
+              </option>
+              {allContractAddresses.map((key, value) => (
+                <option key={key} value={key}>
+                  {key}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
-        <div className='row mt-2'>
-          <div className='mb-2 col-md-4'></div>
-          <div className='mb-2 col-md-4 text-center'>
-            <button onClick={handleSearch} className="mr-2 btn btn-primary white-btn">Apply Filters</button>
-            <button onClick={clearSelections} className="btn btn-primary white-btn">Clear</button>
+        <div className="row mt-2">
+          <div className="mb-2 col-md-4"></div>
+          <div className="mb-2 col-md-4 text-center">
+            <button
+              onClick={handleSearch}
+              className="mr-2 btn btn-primary white-btn"
+            >
+              Apply Filters
+            </button>
+            <button
+              onClick={clearSelections}
+              className="btn btn-primary white-btn"
+            >
+              Clear
+            </button>
           </div>
-          <div className='mb-2 col-md-4'></div>
+          <div className="mb-2 col-md-4"></div>
         </div>
-      </div>
- 
-      <div className='container mt-4'>
-        <div className='row table-responsive'>
-        {transactions?.map((tx, index) => (
-          <div className='col-md-3'>
-            <div class="card mb-2">
-              <h6 className='card-title text-center'>
-                {tx.transaction_hash.slice(0, 6)}...{tx.transaction_hash.slice(35, 42)}
-                <button className='mx-2' onClick={() => copyToClipboard(tx.transaction_hash)}><BsCopy className='inline-icon' /></button>
-                <a href={`https://etherscan.io/tx/${tx.transaction_hash}`} target='_BLANK'><BsBoxArrowUpRight className='inline-icon' /></a>
-              </h6>
-              <div class="card-body">
-                <table class="table-data table">
-                  <tr>
-                    <th>Buy Volume</th>
-                    <td>3.5 $</td>
-                  </tr>
-                  <tr>
-                    <th>Sell Volume</th>
-                    <td>3.5 $</td>
-                  </tr>
-                  <tr>
-                    <th>Net Volume</th>
-                    <td>3.66$</td>
-                  </tr>
-                  <tr>
-                    <th>From Address</th>
-                    <td>
-                      {tx.from_address.slice(0, 4)}...{tx.from_address.slice(38, 42)}
-                      <a className='arrow-link' onClick={() => copyToClipboard(tx.from_address)}><BsCopy className='inline-icon' /></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>To Address</th>
-                    <td>
-                      {tx.to_address.slice(0, 4)}...{tx.to_address.slice(38, 42)}
-                      <a className='arrow-link' onClick={() => copyToClipboard(tx.to_address)}><BsCopy className='inline-icon' /></a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th>Gass Fee</th>
-                    <td>{tx.gas}$</td>
-                  </tr>
-                  <tr>
-                    <th>Transaction Value</th>
-                    <td>${tx.value}</td>
-                  </tr>
-                  <tr>
-                    <td></td>
-                    <td className='text-right'>
-                      <a onClick={() => handleActionClick(tx)} className='arrow-link'><BsArrowRightSquareFill  className='inline-icon arrow-icon'/></a>
-                    </td>
-                  </tr>
-                </table>
+      </div> */}
+
+      {/* <div className="container mt-4">
+        <div className="row table-responsive">
+          {transactions?.map((tx, index) => (
+            <div className="col-md-3">
+              <div class="card mb-2">
+                <h6 className="card-title text-center">
+                  {tx.transaction_hash.slice(0, 6)}...
+                  {tx.transaction_hash.slice(35, 42)}
+                  <button
+                    className="mx-2"
+                    onClick={() => copyToClipboard(tx.transaction_hash)}
+                  >
+                    <BsCopy className="inline-icon" />
+                  </button>
+                  <a
+                    href={`https://etherscan.io/tx/${tx.transaction_hash}`}
+                    target="_BLANK"
+                  >
+                    <BsBoxArrowUpRight className="inline-icon" />
+                  </a>
+                </h6>
+                <div class="card-body">
+                  <table class="table-data table">
+                    <tr>
+                      <th>Buy Volume</th>
+                      <td>3.5 $</td>
+                    </tr>
+                    <tr>
+                      <th>Sell Volume</th>
+                      <td>3.5 $</td>
+                    </tr>
+                    <tr>
+                      <th>Net Volume</th>
+                      <td>3.66$</td>
+                    </tr>
+                    <tr>
+                      <th>From Address</th>
+                      <td>
+                        {tx.from_address.slice(0, 4)}...
+                        {tx.from_address.slice(38, 42)}
+                        <a
+                          className="arrow-link"
+                          onClick={() => copyToClipboard(tx.from_address)}
+                        >
+                          <BsCopy className="inline-icon" />
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>To Address</th>
+                      <td>
+                        {tx.to_address.slice(0, 4)}...
+                        {tx.to_address.slice(38, 42)}
+                        <a
+                          className="arrow-link"
+                          onClick={() => copyToClipboard(tx.to_address)}
+                        >
+                          <BsCopy className="inline-icon" />
+                        </a>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th>Gass Fee</th>
+                      <td>{tx.gas}$</td>
+                    </tr>
+                    <tr>
+                      <th>Transaction Value</th>
+                      <td>${tx.value}</td>
+                    </tr>
+                    <tr>
+                      <td></td>
+                      <td className="text-right">
+                        <a
+                          onClick={() => handleActionClick(tx)}
+                          className="arrow-link"
+                        >
+                          <BsArrowRightSquareFill className="inline-icon arrow-icon" />
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
               </div>
             </div>
-          </div>
           ))}
         </div>
-        <div className='row text-center mt-2 mb-4'>
-          <button className='btn btn-primary load-more-btn'>Load More</button>
+        <div className="row text-center mt-2 mb-4">
+          <button className="btn btn-primary load-more-btn">Load More</button>
         </div>
-      </div>
+      </div> */}
+
       {/* View Details Modal */}
       {isModalOpen1 && (
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="p-8 bg-white rounded-lg">
             <h2 className="mb-4 text-lg font-semibold">Transaction Details</h2>
-            <p><strong>TX Hash:</strong> {selectedTransaction.transaction_hash}</p>
-            <p><strong>Chain ID:</strong> {selectedTransaction.chain_id}</p>
-            <p><strong>Contract Address:</strong> {selectedTransaction.contract_address || "No Contract Address"}</p>
-            <p><strong>From Address:</strong> {selectedTransaction.from_address}</p>
-            <p><strong>To Address:</strong> {selectedTransaction.to_address}</p>
-            <p><strong>Created At:</strong> {selectedTransaction.createdAt}</p>
-            <p><strong>Updated At:</strong> {selectedTransaction.updatedAt}</p>
-            <p><strong>Gas Fee:</strong> ${selectedTransaction.gas}</p>
-            <p><strong>Value:</strong> ${selectedTransaction.value}</p>
-            <button onClick={closeModal} className="px-4 py-2 mt-4 rounded-md load-more-btn">Close</button>
+            <p>
+              <strong>TX Hash:</strong> {selectedTransaction.transaction_hash}
+            </p>
+            <p>
+              <strong>Chain ID:</strong> {selectedTransaction.chain_id}
+            </p>
+            <p>
+              <strong>Contract Address:</strong>{" "}
+              {selectedTransaction.contract_address || "No Contract Address"}
+            </p>
+            <p>
+              <strong>From Address:</strong> {selectedTransaction.from_address}
+            </p>
+            <p>
+              <strong>To Address:</strong> {selectedTransaction.to_address}
+            </p>
+            <p>
+              <strong>Created At:</strong> {selectedTransaction.createdAt}
+            </p>
+            <p>
+              <strong>Updated At:</strong> {selectedTransaction.updatedAt}
+            </p>
+            <p>
+              <strong>Gas Fee:</strong> ${selectedTransaction.gas}
+            </p>
+            <p>
+              <strong>Value:</strong> ${selectedTransaction.value}
+            </p>
+            <button
+              onClick={closeModal}
+              className="px-4 py-2 mt-4 rounded-md load-more-btn"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
@@ -356,8 +666,17 @@ export default function Home() {
                 onChange={handleContractAddressChange}
                 className="px-4 py-2 border border-gray-300 rounded-md w-100"
               />
-              <input type="submit" value="Submit" className="py-2 mt-2 text-white rounded-md w-50 bg-clr" />
-              <button onClick={closeContractModal} className="px-4 py-2 mt-2 mt-4 text-white rounded-md bg-red">Close</button>
+              <input
+                type="submit"
+                value="Submit"
+                className="py-2 mt-2 text-white rounded-md w-50 bg-clr"
+              />
+              <button
+                onClick={closeContractModal}
+                className="px-4 py-2  mt-4 text-white rounded-md bg-red"
+              >
+                Close
+              </button>
             </form>
           </div>
         </div>
