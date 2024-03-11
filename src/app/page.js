@@ -214,14 +214,14 @@ export default function Home() {
     getTransactions();
   };
 
-  // const handleFieldChange = (e) => {
-  //   setPageSize(parseInt(e.target.value, 10));
-  //   setPage(1);
-  // };
+  const handleFieldChange = (e) => {
+    setPageSize(parseInt(e.target.value, 10));
+    setPage(1);
+  };
 
-  // const handlePageChange = (newPage) => {
-  //   setPage(newPage);
-  // };
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
 
   return (
     <main className="mx-auto text-black container-fluid h-screen !bg-white">
@@ -388,7 +388,6 @@ export default function Home() {
                       </tr>
                     ))}
                   </tbody>
-
                   <tfoot>
                     {calculation[0] && calculation[0].gas_sum && (
                       <>
@@ -427,7 +426,25 @@ export default function Home() {
                 <span className="text-gray-500 flex justify-center items-center h-full">
                   No data available.
                 </span>
-              )}
+              )
+              }
+              <div className="tbl-pagination-wrapper">
+                <div className='pagination-limit-wrapper'>
+                  <span>Show </span>
+                  <select value={pageSize} onChange={handleFieldChange}>
+                    <option value="10">10</option>
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                  <span> entries</span>
+                </div>
+                <div className='flex gap-5'>
+                  <button className='cursor-pointer' onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
+                  <span>{page}</span>
+                  <button className='cursor-pointer' onClick={() => handlePageChange(page + 1)} disabled={page === Math.ceil(totalItems / pageSize)}>Next</button>
+                </div>
+              </div>
             </div>
 
             {/* VOLUME */}
