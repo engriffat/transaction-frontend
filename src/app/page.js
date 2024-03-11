@@ -1,6 +1,4 @@
 "use client";
-
-import Image from "next/image";
 import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -10,26 +8,28 @@ import { BsBoxArrowUpRight } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BsArrowRightSquareFill } from "react-icons/bs";
+import moment from "moment";
+import { LuLoader } from "react-icons/lu";
 
 const tableHeaders = [
-  // "ID",
-  "To Address",
+  "Transaction ID",
   "From Address",
+  "To Address",
   "Gas",
   "Value",
-  "Chain ID",
   "Status",
-  "Max Fee Per Gas",
   "Nonce",
-  "Type",
   "Transaction Hash",
   "Created At",
-  "Updated At",
 ];
 
 export default function Home() {
   const [transactions, setTransactions] = useState([]);
   const [calculation, setCalculations] = useState([]);
+  const [volume, setVolume] = useState({});
+  const [buyVolume, setBuyVolume] = useState({});
+  const [sellVolume, setSellVolume] = useState({});
+  const [netVolume, setNetVolume] = useState();
 
   const totalItems = transactions.length;
 
@@ -47,6 +47,7 @@ export default function Home() {
   const [contractAddress, setContractAddress] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [contractKey, setContactkey] = useState("");
 
@@ -125,6 +126,7 @@ export default function Home() {
 
   // get all contract address from Api
   useEffect(() => {
+    setIsLoading(true);
     const fetchData = async () => {
       // const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
       const apiUrl = "http://44.221.66.45:3003";
@@ -133,6 +135,8 @@ export default function Home() {
         const result = await response.json();
         const addresses = result.data.map((item) => item.contract_address);
         setallContractAddresses(addresses);
+        setContactkey(addresses[0]);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching addresses:", error);
       }
@@ -164,6 +168,10 @@ export default function Home() {
 
       const data = await response.json();
       setTransactions(data.data);
+      setVolume(data.vloume);
+      setBuyVolume(data.buy_volume);
+      setSellVolume(data.sell_volume);
+      setNetVolume(data.net_volume || 0);
       setCalculations(data.calculation);
     } catch (error) {
       console.error("Error fetching transaction data:", error);
@@ -263,11 +271,22 @@ export default function Home() {
         <div className="flex  gap-2 w-full h-full mb-4">
           {/* Left Side */}
           <div className="border w-[40%] flex flex-col gap-2 bg-[#ffff] p-2 rounded shadow ">
-            {allContractAddresses.length > 0 ? (
+            {isLoading ? (
+              <div className="flex justify-center items-center h-full">
+                <LuLoader
+                  size={32}
+                  className="animate-spin ease-out duration-2000"
+                />
+              </div>
+            ) : allContractAddresses.length > 0 ? (
               allContractAddresses.map((key, value) => (
                 <div
                   key={value}
-                  className="bg-[#fafafa] p-2 rounded shadow-sm cursor-pointer truncate hover:text-white hover:bg-[#0a0a0a]"
+                  className={`bg-[#fafafa] p-2 rounded shadow-sm cursor-pointer truncate hover:text-white hover:bg-[#0a0a0a] ${
+                    contractKey === key
+                      ? "text-white bg-[#0a0a0a]"
+                      : "text-[#0a0a0a] "
+                  }`}
                   value={key}
                   onClick={() => setContactkey(key)}
                 >
@@ -284,61 +303,116 @@ export default function Home() {
           {/* RIGHT side */}
           <div className="w-full h-full grid grid-cols-3  gap-2">
             <div className="w-full h-full col-span-2 border border-[#fafafa] rounded p-2 shawdow bg-white overflow-auto">
-              {transactions.length > 0 ? (
-                <table className="min-w-full divide-y divide-gray-200">
+              {isLoading ? (
+                <div className="flex justify-center items-center h-full">
+                  <LuLoader
+                    size={32}
+                    className="animate-spin ease-out duration-2000"
+                  />
+                </div>
+              ) : transactions.length > 0 ? (
+                <table className="min-w-full divide-y divide-gray-200 ">
                   <thead className="bg-gray-50">
                     <tr>
                       {tableHeaders.map((header) => (
                         <th
                           key={header}
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                          className="px-6 py-3 text-[10px] font-medium uppercase tracking-wider text-center bg-black text-white"
+                          style={{ width: "40%" }}
                         >
                           {header}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className=" divide-y divide-gray-200 ">
                     {transactions.map((transaction) => (
-                      <tr key={transaction._id} className="hover:bg-gray-100">
-                        {tableHeaders.map((header) => (
-                          <td
-                            key={`${transaction._id}-${header}`}
-                            className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                          >
-                            {
-                              transaction[
-                                header.toLowerCase().replace(" ", "_")
-                              ]
-                            }
-                          </td>
-                        ))}
+                      <tr
+                        key={transaction._id}
+                        className="hover:bg-gray-100 text-[11px] text-center"
+                      >
+                        <td className="py-4 px-2">{transaction._id}</td>
+                        <td
+                          title={transaction.from_address}
+                          className="cursor-pointer"
+                          onClick={() =>
+                            copyToClipboard(transaction.from_address)
+                          }
+                        >
+                          {`${transaction.from_address.slice(
+                            0,
+                            4
+                          )}...${transaction.from_address.slice(38, 42)}`}{" "}
+                          <BsCopy className="inline-icon" />
+                        </td>
+                        <td
+                          style={{ width: "15%" }}
+                          title={transaction.to_address}
+                          className="cursor-pointer"
+                          onClick={() =>
+                            copyToClipboard(transaction.to_address)
+                          }
+                        >
+                          {`${transaction.to_address.slice(
+                            0,
+                            4
+                          )}...${transaction.to_address.slice(38, 42)}`}{" "}
+                          <BsCopy className="inline-icon" />
+                        </td>
+                        <td>{transaction.gas}</td>
+                        <td>{transaction.value}</td>
+                        <td>{transaction.status}</td>
+                        <td>{transaction.nonce}</td>
+                        <td
+                          className="cursor-pointer"
+                          onClick={() =>
+                            copyToClipboard(transaction.transaction_hash)
+                          }
+                        >
+                          {`${transaction.transaction_hash.slice(
+                            0,
+                            4
+                          )}...${transaction.transaction_hash.slice(
+                            38,
+                            42
+                          )}`}{" "}
+                          <BsCopy className="inline-icon" />
+                        </td>
+                        <td>{moment(transaction.createdAt).format("lll")}</td>
                       </tr>
                     ))}
                   </tbody>
+
                   <tfoot>
                     {calculation[0] && calculation[0].gas_sum && (
-                      <tr>
-                        <td
-                          colSpan="3"
-                          className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"
-                        >
-                          Total:
-                        </td>
-                        <td
-                          colSpan="3"
-                          className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                        >
-                          {calculation[0].gas_sum}
-                        </td>
-                        <td
-                          colSpan="7"
-                          className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
-                        >
-                          {calculation[0].value_sum}
-                        </td>
-                        <td></td>
-                      </tr>
+                      <>
+                        <tr>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
+                            Total Gas:
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900">
+                            {calculation[0].gas_sum}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
+                            Total Value:
+                          </td>
+                          <td
+                            colSpan="1"
+                            className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900"
+                          >
+                            {calculation[0].value_sum}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
+                            Total Records:
+                          </td>
+                          <td
+                            colSpan="1"
+                            className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900"
+                          >
+                            {calculation[0].value_sum}
+                          </td>
+                        </tr>
+                      </>
                     )}
                   </tfoot>
                 </table>
@@ -349,100 +423,105 @@ export default function Home() {
               )}
             </div>
 
-            <div className="w-full  rounded p-2 bg-[#ffff] shadow">
-              {transactions.length > 0 ? (
-                transactions?.map((tx, index) => (
-                  <div className="shadow-sm" key={index}>
-                    <div class="card mb-2">
-                      <h6 className="card-title text-center">
-                        {tx.transaction_hash.slice(0, 6)}...
-                        {tx.transaction_hash.slice(35, 42)}
-                        <button
-                          className="mx-2"
-                          onClick={() => copyToClipboard(tx.transaction_hash)}
-                        >
-                          <BsCopy className="inline-icon" />
-                        </button>
-                        <a
-                          href={`https://etherscan.io/tx/${tx.transaction_hash}`}
-                          target="_BLANK"
-                        >
-                          <BsBoxArrowUpRight className="inline-icon" />
-                        </a>
-                      </h6>
-                      <div class="card-body">
-                        <table class="table-data table">
-                          <tr>
-                            <th>Buy Volume</th>
-                            <td>3.5 $</td>
-                          </tr>
-                          <tr>
-                            <th>Sell Volume</th>
-                            <td>3.5 $</td>
-                          </tr>
-                          <tr>
-                            <th>Net Volume</th>
-                            <td>3.66$</td>
-                          </tr>
-                          <tr>
-                            <th>From Address</th>
-                            <td>
-                              {tx.from_address.slice(0, 4)}...
-                              {tx.from_address.slice(38, 42)}
-                              <a
-                                className="arrow-link"
-                                onClick={() => copyToClipboard(tx.from_address)}
-                              >
-                                <BsCopy className="inline-icon" />
-                              </a>
+            {/* VOLUME */}
+            <div className="w-full rounded p-2 bg-[#ffff] shadow flex flex-col gap-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="border p-2 flex justify-between items-center rounded">
+                  <div>Number Of Buyers :</div>
+                  <span>{buyVolume.number_of_buyer || 0}</span>
+                </div>
+                <div className="border p-2 flex justify-between items-center rounded">
+                  <div>Number Of Sellers :</div>
+                  <span>{sellVolume.number_of_seller || 0}</span>
+                </div>
+              </div>
+              <div className="border p-2 flex justify-between items-center rounded">
+                <div>Buy Volume :</div>
+                <span>{buyVolume.value || 0}</span>
+              </div>
+              <div className="border p-2 flex justify-between items-center rounded">
+                <div>Sell Volume :</div>
+                <span>{sellVolume.value || 0}</span>
+              </div>
+              <div className="border p-2 flex justify-between items-center rounded">
+                <div>Net Volume :</div>
+                <span>{netVolume}</span>
+              </div>
+              {isLoading ? (
+                <div className="flex justify-center items-center h-full">
+                  <LuLoader
+                    size={32}
+                    className="animate-spin ease-out duration-2000"
+                  />
+                </div>
+              ) : volume ? (
+                <div className="shadow-sm">
+                  <div className="card mb-2">
+                    <h6 className="card-title text-center">
+                      {volume.contract_address.slice(0, 6)}
+                      <button
+                        className="mx-2"
+                        onClick={() => copyToClipboard(volume.contract_address)}
+                      >
+                        <BsCopy className="inline-icon" />
+                      </button>
+                      <a
+                        href={`https://etherscan.io/tx/${volume.contract_address}`}
+                        target="_BLANK"
+                      >
+                        <BsBoxArrowUpRight className="inline-icon" />
+                      </a>
+                    </h6>
+                    <div className="card-body">
+                      <table className="table-data table">
+                        {Object.keys(volume).map((key, index) => (
+                          <tr key={index}>
+                            <th className="capitalize">
+                              {key.replace(/_/g, " ")}
+                            </th>
+                            <td className="">
+                              {typeof volume[key] === "number"
+                                ? volume[key].toFixed(2)
+                                : key === "contract_address"
+                                ? `${volume[key].slice(0, 4)}...${volume[
+                                    key
+                                  ].slice(38, 42)} `
+                                : volume[key]}
+
+                              {key === "contract_address" && (
+                                <BsCopy
+                                  className="inline-icon"
+                                  title="copy"
+                                  size={28}
+                                  onClick={() => copyToClipboard(volume[key])}
+                                />
+                              )}
                             </td>
                           </tr>
-                          <tr>
-                            <th>To Address</th>
-                            <td>
-                              {tx.to_address.slice(0, 4)}...
-                              {tx.to_address.slice(38, 42)}
-                              <a
-                                className="arrow-link"
-                                onClick={() => copyToClipboard(tx.to_address)}
-                              >
-                                <BsCopy className="inline-icon" />
-                              </a>
-                            </td>
-                          </tr>
-                          <tr>
-                            <th>Gass Fee</th>
-                            <td>{tx.gas}$</td>
-                          </tr>
-                          <tr>
-                            <th>Transaction Value</th>
-                            <td>${tx.value}</td>
-                          </tr>
-                          <tr>
-                            <td></td>
-                            <td className="text-right">
-                              <a
-                                onClick={() => handleActionClick(tx)}
-                                className="arrow-link"
-                              >
-                                <BsArrowRightSquareFill className="inline-icon arrow-icon" />
-                              </a>
-                            </td>
-                          </tr>
-                        </table>
-                      </div>
+                        ))}
+                        <tr>
+                          <td></td>
+                          <td className="text-right">
+                            <a
+                              onClick={() => handleActionClick(volume)}
+                              className="arrow-link"
+                            >
+                              <BsArrowRightSquareFill className="inline-icon arrow-icon" />
+                            </a>
+                          </td>
+                        </tr>
+                      </table>
                     </div>
                   </div>
-                ))
+                </div>
               ) : (
-                <span className="flex justify-center items-center h-full text-gray-500">
-                  No Data Found
-                </span>
+                <span className="flex justify-center items-center h-full text-gray-500"></span>
               )}
             </div>
           </div>
         </div>
       </div>
+
       {/* <div className="container mt-2 filter-box">
         <div className="row">
           <div className="mb-2 col-md-6">
