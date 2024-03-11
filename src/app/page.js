@@ -18,7 +18,6 @@ const tableHeaders = [
   "Gas",
   "Value",
   "Status",
-  "Nonce",
   "Transaction Hash",
   "Created At",
 ];
@@ -129,7 +128,8 @@ export default function Home() {
     setIsLoading(true);
     const fetchData = async () => {
       // const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const apiUrl = "http://44.221.66.45:3003";
+      // const apiUrl = "http://44.221.66.45:3003";
+      const apiUrl = "http://localhost:3003";
       try {
         const response = await fetch(`${apiUrl}/api/getContract`);
         const result = await response.json();
@@ -185,7 +185,7 @@ export default function Home() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("http://44.221.66.45:3003/api/addContract", {
+      const response = await fetch("http://localhost:3003/api/addContract", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -339,10 +339,10 @@ export default function Home() {
                             copyToClipboard(transaction.from_address)
                           }
                         >
-                          {`${transaction.from_address.slice(
+                          {`${transaction?.from_address?.slice(
                             0,
                             4
-                          )}...${transaction.from_address.slice(38, 42)}`}{" "}
+                          )}...${transaction?.from_address?.slice(38, 42)}`}{" "}
                           <BsCopy className="inline-icon" />
                         </td>
                         <td
@@ -362,23 +362,22 @@ export default function Home() {
                         <td>{transaction.gas}</td>
                         <td>{transaction.value}</td>
                         <td>{transaction.status}</td>
-                        <td>{transaction.nonce}</td>
                         <td
                           className="cursor-pointer"
                           onClick={() =>
                             copyToClipboard(transaction.transaction_hash)
                           }
                         >
-                          {`${transaction.transaction_hash.slice(
+                          {`${transaction?.transaction_hash?.slice(
                             0,
                             4
-                          )}...${transaction.transaction_hash.slice(
+                          )}...${transaction?.transaction_hash?.slice(
                             38,
                             42
                           )}`}{" "}
                           <BsCopy className="inline-icon" />
                         </td>
-                        <td>{moment(transaction.createdAt).format("lll")}</td>
+                        <td>{moment(transaction?.createdAt).format("lll")}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -436,16 +435,16 @@ export default function Home() {
                 </div>
               </div>
               <div className="border p-2 flex justify-between items-center rounded">
+                <div>Net Volume :</div>
+                <span>{netVolume}</span>
+              </div>
+              <div className="border p-2 flex justify-between items-center rounded">
                 <div>Buy Volume :</div>
                 <span>{buyVolume.value || 0}</span>
               </div>
               <div className="border p-2 flex justify-between items-center rounded">
                 <div>Sell Volume :</div>
                 <span>{sellVolume.value || 0}</span>
-              </div>
-              <div className="border p-2 flex justify-between items-center rounded">
-                <div>Net Volume :</div>
-                <span>{netVolume}</span>
               </div>
               {isLoading ? (
                 <div className="flex justify-center items-center h-full">
@@ -458,7 +457,7 @@ export default function Home() {
                 <div className="shadow-sm">
                   <div className="card mb-2">
                     <h6 className="card-title text-center">
-                      {volume.contract_address.slice(0, 6)}
+                      {volume?.contract_address?.slice(0, 6)}
                       <button
                         className="mx-2"
                         onClick={() => copyToClipboard(volume.contract_address)}
@@ -474,40 +473,34 @@ export default function Home() {
                     </h6>
                     <div className="card-body">
                       <table className="table-data table">
-                        {Object.keys(volume).map((key, index) => (
-                          <tr key={index}>
+                        {console.log(`volume`, volume)}
+                          <tr>
                             <th className="capitalize">
-                              {key.replace(/_/g, " ")}
+                              Total Supply :
                             </th>
                             <td className="">
-                              {typeof volume[key] === "number"
-                                ? volume[key].toFixed(2)
-                                : key === "contract_address"
-                                ? `${volume[key].slice(0, 4)}...${volume[
-                                    key
-                                  ].slice(38, 42)} `
-                                : volume[key]}
-
-                              {key === "contract_address" && (
-                                <BsCopy
-                                  className="inline-icon"
-                                  title="copy"
-                                  size={28}
-                                  onClick={() => copyToClipboard(volume[key])}
-                                />
-                              )}
+                             {volume.total_supply}
                             </td>
                           </tr>
-                        ))}
+                          <tr>
+                            <th className="capitalize">
+                              Reserve 1:
+                            </th>
+                            <td className="">
+                             {volume.reserve_1}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th className="capitalize">
+                              Reserve 2:
+                            </th>
+                            <td className="">
+                             {volume.reserve_2}
+                            </td>
+                          </tr>
                         <tr>
                           <td></td>
                           <td className="text-right">
-                            <a
-                              onClick={() => handleActionClick(volume)}
-                              className="arrow-link"
-                            >
-                              <BsArrowRightSquareFill className="inline-icon arrow-icon" />
-                            </a>
                           </td>
                         </tr>
                       </table>
