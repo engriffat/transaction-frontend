@@ -393,6 +393,15 @@ export default function Home() {
                     {calculation[0] && calculation[0].gas_sum && (
                       <>
                         <tr>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
+                            Total Records:
+                          </td>
+                          <td
+                            colSpan="1"
+                            className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900"
+                          >
+                            {transactions.length}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
                             Total Gas:
                           </td>
@@ -408,15 +417,7 @@ export default function Home() {
                           >
                             {calculation[0].value_sum}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
-                            Total Records:
-                          </td>
-                          <td
-                            colSpan="1"
-                            className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900"
-                          >
-                            {calculation[0].value_sum}
-                          </td>
+                         
                         </tr>
                       </>
                     )}
