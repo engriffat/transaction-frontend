@@ -505,7 +505,15 @@ export default function Home() {
                               Total Supply :
                             </th>
                             <td className="">
-                             {volume.total_supply}
+                             {volume?.total_supply}
+                            </td>
+                          </tr>
+                          <tr>
+                            <th className="capitalize">
+                            Circulating Supply :
+                            </th>
+                            <td className="">
+                             {volume?.circulating_supply}
                             </td>
                           </tr>
                           <tr>
