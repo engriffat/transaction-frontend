@@ -81,9 +81,9 @@ export default function Home() {
   };
 
   // Function to open add contract modal
-  // const openContractModal = () => {
-  //   setIsModalOpen2(true);
-  // };
+  const openContractModal = () => {
+    setIsModalOpen2(true);
+  };
 
   // Function to close the modal
   const closeModal = () => {
@@ -124,12 +124,16 @@ export default function Home() {
     setContractAddress(event.target.value);
   };
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+
+  
   // get all contract address from Api
   useEffect(() => {
     setIsLoading(true);
     const fetchData = async () => {
       // const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      const apiUrl = "http://44.221.66.45:3003";
+      
       try {
         const response = await fetch(`${apiUrl}/api/getContract`);
         const result = await response.json();
@@ -145,8 +149,6 @@ export default function Home() {
   }, []);
 
   const getTransactions = async () => {
-    // const apiUrl = "http://44.221.66.45:3003";
-    const apiUrl = "http://localhost:3003";
     try {
       const response = await fetch(`${apiUrl}/api/getTransaction`, {
         method: "POST",
@@ -185,7 +187,7 @@ export default function Home() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch("http://44.221.66.45:3003/api/addContract", {
+      const response = await fetch(`${apiUrl}/api/addContract`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -227,7 +229,7 @@ export default function Home() {
       <ToastContainer />
 
       <div className="flex flex-col gap-3 bg-[#fafafa] h-full">
-        <div className="flex  gap-2 justify-center items-center w-[850px] mt-4 bg-white rounded shadow-sm p-2">
+        <div className="flex  gap-2 justify-center items-center w-[100%] mt-4 bg-white rounded shadow-sm p-2">
           <DatePicker
             showTimeSelect
             dateFormat="MMMM d, yyyy h:mmaa"
@@ -265,6 +267,12 @@ export default function Home() {
             >
               Clear
             </button>
+            <button
+              onClick={openContractModal}
+              className="btn btn-primary colored-btn"
+            >
+              Add Contract Address
+            </button>
           </div>
         </div>
 
@@ -282,10 +290,10 @@ export default function Home() {
               allContractAddresses.map((key, value) => (
                 <div
                   key={value}
-                  className={`bg-[#fafafa] p-2 rounded shadow-sm cursor-pointer truncate hover:text-white hover:bg-[#0a0a0a] ${
+                  className={`bg-[#fafafa] p-2 rounded shadow-sm cursor-pointer truncate address-box hover:bg-[#0a0a0a] ${
                     contractKey === key
-                      ? "text-white bg-[#0a0a0a]"
-                      : "text-[#0a0a0a] "
+                      ? "text-white bg-black"
+                      : "text-black "
                   }`}
                   value={key}
                   onClick={() => setContactkey(key)}
@@ -458,7 +466,7 @@ export default function Home() {
                 <div className="shadow-sm">
                   <div className="card mb-2">
                     <h6 className="card-title text-center">
-                      {volume.contract_address.slice(0, 6)}
+                      {volume?.contract_address?.slice(0, 6)}
                       <button
                         className="mx-2"
                         onClick={() => copyToClipboard(volume.contract_address)}
@@ -748,11 +756,11 @@ export default function Home() {
               <input
                 type="submit"
                 value="Submit"
-                className="py-2 mt-2 text-white rounded-md w-50 bg-clr"
+                className="btn btn-primary mx-2 colored-btn mt-4"
               />
               <button
                 onClick={closeContractModal}
-                className="px-4 py-2  mt-4 text-white rounded-md bg-red"
+                className="btn btn-primary bg-red mt-4"
               >
                 Close
               </button>
