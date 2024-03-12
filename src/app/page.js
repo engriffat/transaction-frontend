@@ -313,7 +313,7 @@ export default function Home() {
 
           {/* RIGHT side */}
           <div className="w-full h-full grid grid-cols-3 gap-2 ">
-            <div className="col-span-2 overflow-auto border shadow space-y-4">
+            <div className="col-span-2 overflow-auto  shadow space-y-4">
               <div className="w-full max-h-[85%] min-h-[85%] h-[85%]  border border-[#fafafa] rounded p-2 bg-white overflow-auto">
                 {isLoading || tableLoader ? (
                   <div className="flex justify-center items-center h-screen">
@@ -437,35 +437,37 @@ export default function Home() {
                   </span>
                 )}
               </div>
-              <div className="tbl-pagination-wrapper py-8 border shadow-md">
-                <div className="pagination-limit-wrapper">
-                  <span>Show </span>
-                  <select value={pageSize} onChange={handleFieldChange}>
-                    <option value="10">10</option>
-                    <option value="25">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                  </select>
-                  <span> entries</span>
+              {transactions.length > 0 && (
+                <div className="tbl-pagination-wrapper py-8  shadow-md">
+                  <div className="pagination-limit-wrapper">
+                    <span>Show </span>
+                    <select value={pageSize} onChange={handleFieldChange}>
+                      <option value="10">10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                      <option value="100">100</option>
+                    </select>
+                    <span> entries</span>
+                  </div>
+                  <div className="flex gap-5">
+                    <button
+                      className="cursor-pointer border-black border rounded py-1 px-2 font-semibold disabled:cursor-not-allowed"
+                      onClick={() => handlePageChange(page - 1)}
+                      disabled={page === 1}
+                    >
+                      Previous
+                    </button>
+                    <span>{page}</span>
+                    <button
+                      className="cursor-pointer bg-black text-white px-2 py-1 rounded disabled:cursor-not-allowed"
+                      onClick={() => handlePageChange(page + 1)}
+                      disabled={page === Math.ceil(totalItems / pageSize)}
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-5">
-                  <button
-                    className="cursor-pointer border-black border rounded py-1 px-2 font-semibold disabled:cursor-not-allowed"
-                    onClick={() => handlePageChange(page - 1)}
-                    disabled={page === 1}
-                  >
-                    Previous
-                  </button>
-                  <span>{page}</span>
-                  <button
-                    className="cursor-pointer bg-black text-white px-2 py-1 rounded disabled:cursor-not-allowed"
-                    onClick={() => handlePageChange(page + 1)}
-                    disabled={page === Math.ceil(totalItems / pageSize)}
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
+              )}
             </div>
 
             {/* VOLUME */}
