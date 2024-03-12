@@ -29,8 +29,9 @@ export default function Home() {
   const [buyVolume, setBuyVolume] = useState({});
   const [sellVolume, setSellVolume] = useState({});
   const [netVolume, setNetVolume] = useState();
+  const [count, setCount] = useState(0);
 
-  const totalItems = transactions.length;
+  const totalItems = count;
 
   const [sortedField, setSortedField] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
@@ -47,6 +48,7 @@ export default function Home() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isLoading, setIsLoading] = useState(true);
+  const [tableLoader, setTableLoader] = useState(true);
 
   const [contractKey, setContactkey] = useState("");
 
@@ -125,29 +127,28 @@ export default function Home() {
 
   const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+  const fetchData = async () => {
+    // const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    try {
+      const response = await fetch(`${apiUrl}/api/getContract`);
+      const result = await response.json();
+      const addresses = result.data.map((item) => item.contract_address);
+      setallContractAddresses(addresses);
+      setContactkey(addresses[0]);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+    }
+  };
 
-  
   // get all contract address from Api
   useEffect(() => {
     setIsLoading(true);
-    const fetchData = async () => {
-      // const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
-      
-      try {
-        const response = await fetch(`${apiUrl}/api/getContract`);
-        const result = await response.json();
-        const addresses = result.data.map((item) => item.contract_address);
-        setallContractAddresses(addresses);
-        setContactkey(addresses[0]);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching addresses:", error);
-      }
-    };
     fetchData();
   }, []);
 
   const getTransactions = async () => {
+    setTableLoader(true);
     try {
       const response = await fetch(`${apiUrl}/api/getTransaction`, {
         method: "POST",
@@ -169,14 +170,18 @@ export default function Home() {
 
       const data = await response.json();
       setTransactions(data.data);
+      setCount(data.count);
       setVolume(data.vloume);
       setBuyVolume(data.buy_volume);
       setSellVolume(data.sell_volume);
       setNetVolume(data.net_volume || 0);
       setCalculations(data.calculation);
+      setTableLoader(false);
     } catch (error) {
       console.error("Error fetching transaction data:", error);
     }
+
+    setTableLoader(false);
   };
 
   useEffect(() => {
@@ -203,6 +208,7 @@ export default function Home() {
       const data = await response.json();
       toast.success(data.Message); // Show success message
       setContractAddress(""); // Clear input field
+      fetchData();
       setIsModalOpen2(false); // Close modal
     } catch (error) {
       toast.error("Error adding contract address:", error);
@@ -290,9 +296,7 @@ export default function Home() {
                 <div
                   key={value}
                   className={`bg-[#fafafa] p-2 rounded shadow-sm cursor-pointer truncate address-box hover:bg-[#0a0a0a] ${
-                    contractKey === key
-                      ? "text-white bg-black"
-                      : "text-black "
+                    contractKey === key ? "text-white bg-black" : "text-black "
                   }`}
                   value={key}
                   onClick={() => setContactkey(key)}
@@ -308,128 +312,133 @@ export default function Home() {
           </div>
 
           {/* RIGHT side */}
-          <div className="w-full h-full grid grid-cols-3  gap-2">
-            <div className="w-full h-full col-span-2 border border-[#fafafa] rounded p-2 shawdow bg-white overflow-auto">
-              {isLoading ? (
-                <div className="flex justify-center items-center h-full">
-                  <LuLoader
-                    size={32}
-                    className="animate-spin ease-out duration-2000"
-                  />
-                </div>
-              ) : transactions.length > 0 ? (
-                <table className="min-w-full divide-y divide-gray-200 ">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      {tableHeaders.map((header) => (
-                        <th
-                          key={header}
-                          className="px-6 py-3 text-[10px] font-medium uppercase tracking-wider text-center bg-black text-white"
-                          style={{ width: "40%" }}
-                        >
-                          {header}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody className=" divide-y divide-gray-200 ">
-                    {transactions.map((transaction) => (
-                      <tr
-                        key={transaction._id}
-                        className="hover:bg-gray-100 text-[11px] text-center"
-                      >
-                        <td className="py-4 px-2">{transaction._id}</td>
-                        <td
-                          title={transaction.from_address}
-                          className="cursor-pointer"
-                          onClick={() =>
-                            copyToClipboard(transaction.from_address)
-                          }
-                        >
-                          {`${transaction?.from_address?.slice(
-                            0,
-                            4
-                          )}...${transaction?.from_address?.slice(38, 42)}`}{" "}
-                          <BsCopy className="inline-icon" />
-                        </td>
-                        <td
-                          style={{ width: "15%" }}
-                          title={transaction.to_address}
-                          className="cursor-pointer"
-                          onClick={() =>
-                            copyToClipboard(transaction.to_address)
-                          }
-                        >
-                          {`${transaction.to_address.slice(
-                            0,
-                            4
-                          )}...${transaction.to_address.slice(38, 42)}`}{" "}
-                          <BsCopy className="inline-icon" />
-                        </td>
-                        <td>{transaction.gas}</td>
-                        <td>{transaction.value}</td>
-                        <td>{transaction.status}</td>
-                        <td
-                          className="cursor-pointer"
-                          onClick={() =>
-                            copyToClipboard(transaction.transaction_hash)
-                          }
-                        >
-                          {`${transaction?.transaction_hash?.slice(
-                            0,
-                            4
-                          )}...${transaction?.transaction_hash?.slice(
-                            38,
-                            42
-                          )}`}{" "}
-                          <BsCopy className="inline-icon" />
-                        </td>
-                        <td>{moment(transaction?.createdAt).format("lll")}</td>
+          <div className="w-full h-full grid grid-cols-3 gap-2 ">
+            <div className="col-span-2 overflow-auto border shadow space-y-4">
+              <div className="w-full max-h-[85%] min-h-[85%] h-[85%]  border border-[#fafafa] rounded p-2 bg-white overflow-auto">
+                {isLoading || tableLoader ? (
+                  <div className="flex justify-center items-center h-screen">
+                    <LuLoader
+                      size={32}
+                      className="animate-spin ease-out duration-2000"
+                    />
+                  </div>
+                ) : transactions.length > 0 ? (
+                  <table className="min-w-full divide-y divide-gray-200 ">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        {tableHeaders.map((header) => (
+                          <th
+                            key={header}
+                            className="px-6 py-3 text-[10px] font-medium uppercase tracking-wider text-center bg-black text-white"
+                            style={{ width: "40%" }}
+                          >
+                            {header}
+                          </th>
+                        ))}
                       </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    {calculation[0] && calculation[0].gas_sum && (
-                      <>
-                        <tr>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
-                            Total Records:
+                    </thead>
+                    <tbody className=" divide-y divide-gray-200 ">
+                      {transactions.map((transaction) => (
+                        <tr
+                          key={transaction._id}
+                          className="hover:bg-gray-100 text-[11px] text-center"
+                        >
+                          <td className="py-4 px-2">{transaction._id}</td>
+                          <td
+                            title={transaction.from_address}
+                            className="cursor-pointer"
+                            onClick={() =>
+                              copyToClipboard(transaction.from_address)
+                            }
+                          >
+                            {`${transaction?.from_address?.slice(
+                              0,
+                              4
+                            )}...${transaction?.from_address?.slice(
+                              38,
+                              42
+                            )}`}{" "}
+                            <BsCopy className="inline-icon" />
                           </td>
                           <td
-                            colSpan="1"
-                            className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900"
+                            style={{ width: "15%" }}
+                            title={transaction.to_address}
+                            className="cursor-pointer"
+                            onClick={() =>
+                              copyToClipboard(transaction.to_address)
+                            }
                           >
-                            {transactions.length}
+                            {`${transaction.to_address.slice(
+                              0,
+                              4
+                            )}...${transaction.to_address.slice(38, 42)}`}{" "}
+                            <BsCopy className="inline-icon" />
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
-                            Total Gas:
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900">
-                            {calculation[0].gas_sum}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
-                            Total Value:
-                          </td>
+                          <td>{transaction.gas}</td>
+                          <td>{transaction.value}</td>
+                          <td>{transaction.status}</td>
                           <td
-                            colSpan="1"
-                            className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900"
+                            className="cursor-pointer"
+                            onClick={() =>
+                              copyToClipboard(transaction.transaction_hash)
+                            }
                           >
-                            {calculation[0].value_sum}
+                            {`${transaction?.transaction_hash?.slice(
+                              0,
+                              4
+                            )}...${transaction?.transaction_hash?.slice(
+                              38,
+                              42
+                            )}`}{" "}
+                            <BsCopy className="inline-icon" />
                           </td>
-                         
+                          <td>
+                            {moment(transaction?.createdAt).format("lll")}
+                          </td>
                         </tr>
-                      </>
-                    )}
-                  </tfoot>
-                </table>
-              ) : (
-                <span className="text-gray-500 flex justify-center items-center h-full">
-                  No data available.
-                </span>
-              )
-              }
-              <div className="tbl-pagination-wrapper">
-                <div className='pagination-limit-wrapper'>
+                      ))}
+                    </tbody>
+                    <tfoot>
+                      {calculation[0] && calculation[0].gas_sum && (
+                        <>
+                          <tr>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
+                              Total Records:
+                            </td>
+                            <td
+                              colSpan="1"
+                              className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900"
+                            >
+                              {transactions.length}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
+                              Total Gas:
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900">
+                              {calculation[0].gas_sum}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-600">
+                              Total Value:
+                            </td>
+                            <td
+                              colSpan="1"
+                              className="px-6 py-4 whitespace-nowrap font-bold text-sm text-gray-900"
+                            >
+                              {calculation[0].value_sum}
+                            </td>
+                          </tr>
+                        </>
+                      )}
+                    </tfoot>
+                  </table>
+                ) : (
+                  <span className="text-gray-500 flex justify-center items-center h-full">
+                    No data available.
+                  </span>
+                )}
+              </div>
+              <div className="tbl-pagination-wrapper py-8 border shadow-md">
+                <div className="pagination-limit-wrapper">
                   <span>Show </span>
                   <select value={pageSize} onChange={handleFieldChange}>
                     <option value="10">10</option>
@@ -439,10 +448,22 @@ export default function Home() {
                   </select>
                   <span> entries</span>
                 </div>
-                <div className='flex gap-5'>
-                  <button className='cursor-pointer' onClick={() => handlePageChange(page - 1)} disabled={page === 1}>Previous</button>
+                <div className="flex gap-5">
+                  <button
+                    className="cursor-pointer border-black border rounded py-1 px-2 font-semibold disabled:cursor-not-allowed"
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 1}
+                  >
+                    Previous
+                  </button>
                   <span>{page}</span>
-                  <button className='cursor-pointer' onClick={() => handlePageChange(page + 1)} disabled={page === Math.ceil(totalItems / pageSize)}>Next</button>
+                  <button
+                    className="cursor-pointer bg-black text-white px-2 py-1 rounded disabled:cursor-not-allowed"
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={page === Math.ceil(totalItems / pageSize)}
+                  >
+                    Next
+                  </button>
                 </div>
               </div>
             </div>
@@ -500,42 +521,25 @@ export default function Home() {
                     <div className="card-body">
                       <table className="table-data table">
                         {console.log(`volume`, volume)}
-                          <tr>
-                            <th className="capitalize">
-                              Total Supply :
-                            </th>
-                            <td className="">
-                             {volume?.total_supply}
-                            </td>
-                          </tr>
-                          <tr>
-                            <th className="capitalize">
-                            Circulating Supply :
-                            </th>
-                            <td className="">
-                             {volume?.circulating_supply}
-                            </td>
-                          </tr>
-                          <tr>
-                            <th className="capitalize">
-                              Reserve 1:
-                            </th>
-                            <td className="">
-                             {volume.reserve_1}
-                            </td>
-                          </tr>
-                          <tr>
-                            <th className="capitalize">
-                              Reserve 2:
-                            </th>
-                            <td className="">
-                             {volume.reserve_2}
-                            </td>
-                          </tr>
+                        <tr>
+                          <th className="capitalize">Total Supply :</th>
+                          <td className="">{volume?.total_supply}</td>
+                        </tr>
+                        <tr>
+                          <th className="capitalize">Circulating Supply :</th>
+                          <td className="">{volume?.circulating_supply}</td>
+                        </tr>
+                        <tr>
+                          <th className="capitalize">Reserve 1:</th>
+                          <td className="">{volume.reserve_1}</td>
+                        </tr>
+                        <tr>
+                          <th className="capitalize">Reserve 2:</th>
+                          <td className="">{volume.reserve_2}</td>
+                        </tr>
                         <tr>
                           <td></td>
-                          <td className="text-right">
-                          </td>
+                          <td className="text-right"></td>
                         </tr>
                       </table>
                     </div>
