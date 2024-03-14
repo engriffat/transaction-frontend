@@ -16,13 +16,13 @@
   }
 }
 
-body {
+/* body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(to bottom,
       transparent,
       rgb(var(--background-end-rgb))) rgb(var(--background-start-rgb));
   background-repeat: no-repeat;
-}
+} */
 
 @layer utilities {
   .text-balance {
@@ -31,10 +31,10 @@ body {
 }
 
 /* Custom css by iffat*/
-.main-banner {
+/* .main-banner {
   background: rgb(7, 121, 144);
   padding-top: 40px;
-}
+} */
 
 .banner-header {
   color: white;
@@ -46,7 +46,7 @@ body {
   text-align: center;
 }
 
-.colored-btn{
+.colored-btn {
   background-color: rgb(7, 121, 144) !important;
   font-size: 12px !important;
   text-transform: uppercase;
@@ -106,46 +106,55 @@ body {
 
 /* pagination & table pages css  */
 
-.filter-box{
+.filter-box {
   padding-top: 35px;
   background: #077990;
   padding-bottom: 20px
 }
-.white-btn{
+
+.white-btn {
   background-color: white !important;
   color: black !important;
   font-size: 12px !important;
   text-transform: uppercase;
 }
-.table-header>th{
+
+.table-header>th {
   background-color: #077990 !important;
 }
-.table-data td{
+
+.table-data td {
   font-size: 13px;
   padding-bottom: 5px;
   text-align: right;
 }
+
 .table-data th {
   font-size: 13px;
   font-weight: normal;
   padding-bottom: 5px;
 }
-.arrow-icon{
+
+.arrow-icon {
   font-size: 22px;
   color: #077990;
 }
-.arrow-link{
+
+.arrow-link {
   border-bottom: none;
 }
+
 .card-body {
   padding-top: 0px;
   padding-bottom: 0px;
 }
-.card-title{
+
+.card-title {
   border-bottom: 1px solid #d2d2d2;
   padding-top: 10px;
   padding-bottom: 10px;
 }
-.address-box:hover{
+
+.address-box:hover {
   color: white !important;
 }
