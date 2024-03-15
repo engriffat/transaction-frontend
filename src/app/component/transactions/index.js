@@ -128,7 +128,6 @@ export default function TransactionsComponent() {
   const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const fetchData = async () => {
-    // const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
     try {
       const response = await fetch(`${apiUrl}/api/getContract`);
       const result = await response.json();
@@ -141,7 +140,6 @@ export default function TransactionsComponent() {
     }
   };
 
-  // get all contract address from Api
   useEffect(() => {
     setIsLoading(true);
     fetchData();

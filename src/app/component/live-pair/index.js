@@ -1,213 +1,62 @@
-import { useState } from "react";
+import moment from "moment";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-
-const rowsData = [
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-  {
-    id: 1,
-    address: "0x0001",
-    date: "2023-01-01",
-    amount1: "$100,000",
-    amount2: "50",
-    amount3: "30",
-    amount4: "100",
-    amount5: "80",
-    amount6: "$20,000",
-    amount7: "$15,000",
-    amount8: "$1,000,000",
-    amount9: "$10",
-  },
-];
+import { BsCopy } from "react-icons/bs";
+import { LuLoader } from "react-icons/lu";
 
 const LivePair = () => {
-  const [startDate, setStartDate] = useState(null);
-  const [page, setPage] = useState(1);
-  const [endDate, setEndDate] = useState(null);
-  const [pageSize, setPageSize] = useState(10);
-  const [count, setCount] = useState(0);
+  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  const totalItems = count;
+  const [newToken, setNewToken] = useState([]);
+
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+
+  const totalItems = newToken.length;
+
+  const copyToClipboard = async (textToCopy) => {
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      toast.success("Copied!");
+    } catch (err) {
+      console.error("Unable to copy to clipboard.", err);
+    }
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/getNewToken`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          page_number: page || "",
+          limit: pageSize || "",
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Failed to fetch transaction data");
+      }
+
+      setNewToken(data.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+    }
+  };
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchData();
+  }, [pageSize, page]);
 
   const handleFieldChange = (e) => {
     setPageSize(parseInt(e.target.value, 10));
@@ -228,10 +77,10 @@ const LivePair = () => {
   };
 
   const startIndex = (page - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, rowsData.length);
+  const endIndex = Math.min(startIndex + pageSize, newToken.length);
 
   return (
-    <div className="container mx-auto p-4">
+    <div className=" mx-auto p-4">
       <div className="-mx-4 overflow-x-auto flex flex-col gap-[50px]">
         <div className="flex  gap-2 justify-center items-center w-[100%] mt-4 bg-white rounded shadow-sm p-2">
           <input
@@ -265,81 +114,107 @@ const LivePair = () => {
 
           <div className="flex gap-2 justify-center items-center text-center w-3/5 ">
             <button
-              onClick={handleSearch}
-              className="btn btn-primary white-btn"
-            >
-              Submit
-            </button>
-            <button
               onClick={clearSelections}
-              className="btn btn-primary white-btn"
+              className="btn btn-primary white-btn  w-full"
             >
               Clear
             </button>
+            <button
+              onClick={handleSearch}
+              className="btn bg-black text-white white-btn w-full"
+            >
+              Submit
+            </button>
           </div>
         </div>
-        <table className="min-w-full mx-auto bg-white shadow overflow-hidden sm:rounded-lg">
+        <table className="w-full mx-auto bg-white shadow overflow-hidden sm:rounded-lg">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Contract Address
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Created Date
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Liquidity
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                No of Buys
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                No of Sells
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                No of Buyers
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                No of Sellers
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Buy Volume
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Sell Volume
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Market Cap
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Price
-              </th>
+              {[
+                "Contract Address",
+                "Pair Address",
+                "Created Date",
+                "Liquidity",
+                "No of Buys",
+                "No of Sells",
+                "No of Buyers",
+                "No of Sellers",
+                "Buy Volume",
+                "Sell Volume",
+                "Market Cap",
+                "Price",
+              ].map((header, index) => (
+                <th
+                  key={index}
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  {header}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {rowsData.slice(startIndex, endIndex).map((row) => (
-              <tr key={row.id}>
-                <td className="px-6 py-4 whitespace-nowrap">{row.address}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.date}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.amount1}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.amount2}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.amount3}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.amount4}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.amount5}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.amount6}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.amount7}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.amount8}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{row.amount9}</td>
-              </tr>
-            ))}
+            {isLoading ? (
+              <div className="flex justify-center items-center h-screen">
+                <LuLoader
+                  size={32}
+                  className="animate-spin ease-out duration-2000"
+                />
+              </div>
+            ) : newToken && newToken.length > 0 ? (
+              newToken.slice(startIndex, endIndex).map((data) => (
+                <tr key={data.id}>
+                  <td
+                    className="px-6 py-4 cursor-pointer"
+                    onClick={() => copyToClipboard(data?.contract_address)}
+                  >
+                    {`${data?.contract_address.slice(
+                      0,
+                      4
+                    )}...${data?.contract_address.slice(38, 42)}`}{" "}
+                    <BsCopy className="inline-icon" />
+                  </td>
+                  <td
+                    className="px-6 py-4 cursor-pointer"
+                    onClick={() => copyToClipboard(data?.pair_address)}
+                  >
+                    {`${data?.pair_address.slice(
+                      0,
+                      4
+                    )}...${data?.pair_address.slice(38, 42)}`}{" "}
+                    <BsCopy className="inline-icon" />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    {moment(data.createdAt).format("lll")}
+                  </td>
+                  <td className="px-6 py-4 ">{data.liquidity}</td>
+                  <td className="px-6 py-4 ">{data.number_of_buyer}</td>
+                  <td className="px-6 py-4 ">{data.number_of_seller}</td>
+                  <td className="px-6 py-4 ">{data.number_of_buyer}</td>
+                  <td className="px-6 py-4 ">{data.number_of_seller}</td>
+                  <td className="px-6 py-4 ">{data.buy_volume}</td>
+                  <td className="px-6 py-4 ">{data.sell_volume}</td>
+                  <td className="px-6 py-4 ">{data.market_cap}</td>
+                  <td className="px-6 py-4 ">{data.price}</td>
+                </tr>
+              ))
+            ) : (
+              <span className="flex justify-center items-center w-full">
+                No data
+              </span>
+            )}
           </tbody>
         </table>
       </div>
-      {rowsData.length > 0 && (
-        <div className="tbl-pagination-wrapper py-8  shadow-md">
+      {newToken.length > 0 && (
+        <div className="tbl-pagination-wrapper py-8  shadow-md !bg-white">
           <div className="pagination-limit-wrapper">
             <span>Show </span>
-            <select value={pageSize} onChange={handleFieldChange}>
+            <select
+              value={pageSize}
+              onChange={handleFieldChange}
+              className="w-14 rounded"
+            >
               <option value="10">10</option>
               <option value="25">25</option>
               <option value="50">50</option>
@@ -359,7 +234,7 @@ const LivePair = () => {
             <button
               className="cursor-pointer bg-black text-white px-2 py-1 rounded disabled:cursor-not-allowed"
               onClick={() => handlePageChange(page + 1)}
-              disabled={page === Math.ceil(rowsData.length / pageSize)}
+              disabled={page === Math.ceil(totalItems / pageSize)}
             >
               Next
             </button>

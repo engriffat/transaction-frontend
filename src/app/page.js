@@ -5,6 +5,7 @@ import LivePair from "./component/live-pair";
 
 export default function Home() {
   const [tab, setTab] = useState(0);
+
   const handleTabClick = (index) => {
     setTab(index);
   };
@@ -22,7 +23,7 @@ export default function Home() {
         </span>
         <span
           onClick={() => handleTabClick(1)}
-          className={`p-2 w-full max-w-[200px] cursor-pointer font-bold text-sm text-center rounded-md ${
+          className={`p-2 w-full max-w-[200px] border cursor-pointer font-bold text-sm text-center rounded-md ${
             tab === 1 ? "bg-black text-white" : ""
           } `}
         >
