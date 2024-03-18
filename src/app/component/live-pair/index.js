@@ -80,39 +80,92 @@ const LivePair = () => {
   const endIndex = Math.min(startIndex + pageSize, newToken.length);
 
   return (
-    <div className=" mx-auto p-4">
+    <div className="mx-auto p-4">
       <div className="-mx-4 overflow-x-auto flex flex-col gap-[50px]">
-        <div className="flex  gap-2 justify-center items-center w-[100%] mt-4 bg-white rounded shadow-sm p-2">
-          <input
-            type="text"
-            className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-            placeholder="Contract address"
-          />
-          <DatePicker
-            showTimeSelect
-            dateFormat="MMMM d, yyyy h:mmaa"
-            selected={startDate}
-            selectsStart
-            startDate={startDate}
-            endDate={endDate}
-            onChange={(date) => setStartDate(date)}
-            placeholderText="Start Date & Time"
-            className=" px-4 py-2  border border-gray-300 rounded-md w-full"
-          />
-          <DatePicker
-            showTimeSelect
-            dateFormat="MMMM d, yyyy h:mmaa"
-            selected={endDate}
-            onChange={(date) => setEndDate(date)}
-            selectsEnd
-            startDate={startDate}
-            endDate={endDate}
-            minDate={startDate}
-            placeholderText="End Date & Time"
-            className="px-4 py-2 border border-gray-300 rounded-md w-full"
-          />
+        <div className="grid grid-cols-6 gap-2 w-[100%] mt-4 rounded shadow-sm p-2">
+          <div className="col-span-5 grid grid-cols-4 gap-2">
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="Contract address"
+            />
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="Pair address"
+            />
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="LIQUIDITY"
+            />
+            <input
+              type="number"
+              min={0}
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="No Of Buys"
+            />
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="No Of Sells"
+            />
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="NO OF BUYERS	"
+            />
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="NO OF SELLERS	"
+            />
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="BUY VOLUME	"
+            />
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="SELL VOLUME	"
+            />
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="MARKET CAP	"
+            />
+            <input
+              type="text"
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              placeholder="PRICE"
+            />
+            <DatePicker
+              showTimeSelect
+              dateFormat="MMMM d, yyyy h:mmaa"
+              selected={startDate}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(date) => setStartDate(date)}
+              placeholderText="Start Date & Time"
+              className=" px-4 py-2  border border-gray-300 rounded-md w-full"
+            />
+            <DatePicker
+              showTimeSelect
+              dateFormat="MMMM d, yyyy h:mmaa"
+              selected={endDate}
+              onChange={(date) => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              placeholderText="End Date & Time"
+              className="px-4 py-2 border border-gray-300 rounded-md w-full"
+            />
+          </div>
 
-          <div className="flex gap-2 justify-center items-center text-center w-3/5 ">
+          <div className="flex gap-2 justify-center items-center text-center px-2 border">
             <button
               onClick={clearSelections}
               className="btn btn-primary white-btn  w-full"
@@ -206,6 +259,7 @@ const LivePair = () => {
           </tbody>
         </table>
       </div>
+
       {newToken.length > 0 && (
         <div className="tbl-pagination-wrapper py-8  shadow-md !bg-white">
           <div className="pagination-limit-wrapper">

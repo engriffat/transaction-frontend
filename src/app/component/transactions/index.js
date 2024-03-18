@@ -42,6 +42,7 @@ export default function TransactionsComponent() {
   const [endDate, setEndDate] = useState(null);
   const [isModalOpen1, setIsModalOpen1] = useState(false);
   const [isModalOpen2, setIsModalOpen2] = useState(false);
+  const [telegramModal, setTelegramModal] = useState(false);
   const [allContractAddresses, setallContractAddresses] = useState([]);
   const [SelectedcontractAddress, setcontractAddress] = useState("");
   const [contractAddress, setContractAddress] = useState("");
@@ -232,50 +233,145 @@ export default function TransactionsComponent() {
       <ToastContainer />
 
       <div className="flex flex-col gap-3 bg-[#fafafa] h-full">
-        <div className="flex  gap-2 justify-center items-center w-[100%] mt-4 bg-white rounded shadow-sm p-2">
-          <DatePicker
-            showTimeSelect
-            dateFormat="MMMM d, yyyy h:mmaa"
-            selected={startDate}
-            selectsStart
-            startDate={startDate}
-            endDate={endDate}
-            onChange={(date) => setStartDate(date)}
-            placeholderText="Start Date & Time"
-            className=" px-4 py-2  border border-gray-300 rounded-md w-full"
-          />
-          <DatePicker
-            showTimeSelect
-            dateFormat="MMMM d, yyyy h:mmaa"
-            selected={endDate}
-            onChange={(date) => setEndDate(date)}
-            selectsEnd
-            startDate={startDate}
-            endDate={endDate}
-            minDate={startDate}
-            placeholderText="End Date & Time"
-            className="px-4 py-2 border border-gray-300 rounded-md w-full"
-          />
+        <div className="grid grid-cols-4 mt-4 bg-white rounded shadow-sm p-2 gap-4">
+          {/* Filter Inputs */}
+          <div className="col-span-3 gap-2 h-full  grid sm:grid-cols-2 lg:grid-cols-4">
+            <input
+              type="text"
+              placeholder="Search by TX Hash"
+              value={filterTxHash}
+              onChange={(e) => setFilterTxHash(e.target.value)}
+              className="p-2 border border-gray-300 rounded-md w-100 h-[40px]"
+            />
+            <input
+              type="text"
+              placeholder="Method"
+              // value={method}
+              // onChange={(e) => setFilterMethod(e.target.value)}
+              className="p-2 border border-gray-300 rounded-md w-100 h-[40px]"
+            />
+            <select
+              type="text"
+              placeholder="status"
+              // value={method}
+              // onChange={(e) => setFilterMethod(e.target.value)}
+              className="p-2 border border-gray-300 rounded-md w-100 h-[40px]"
+            >
+              <option selected disabled>
+                status
+              </option>
+              <option>Pending</option>
+              <option>confirmed</option>
+            </select>
+            <input
+              type="text"
+              placeholder="Volume"
+              // value={method}
+              // onChange={(e) => setFilterMethod(e.target.value)}
+              className="p-2 border border-gray-300 rounded-md w-100 h-[40px]"
+            />
+            <div className="flex flex-col gap-2 justify-center items-center p-2 border border-gray-300 rounded-md">
+              <span>Date Range</span>
+              <div className="flex justify-between gap-4">
+                <DatePicker
+                  showTimeSelect
+                  dateFormat="MMMM d, yyyy h:mmaa"
+                  selected={startDate}
+                  selectsStart
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChange={(date) => setStartDate(date)}
+                  placeholderText="Start Date & Time"
+                  className=" px-4 py-2 border border-gray-300 rounded-md w-100"
+                />
+                <DatePicker
+                  showTimeSelect
+                  dateFormat="MMMM d, yyyy h:mmaa"
+                  selected={endDate}
+                  onChange={(date) => setEndDate(date)}
+                  selectsEnd
+                  startDate={startDate}
+                  endDate={endDate}
+                  minDate={startDate}
+                  placeholderText="End Date & Time"
+                  className="px-4 py-2 border border-gray-300 rounded-md w-100"
+                />
+              </div>
+            </div>
 
-          <div className="flex gap-2 justify-center items-center text-center w-3/5 ">
-            <button
-              onClick={handleSearch}
-              className="btn btn-primary white-btn"
-            >
-              Apply Filters
-            </button>
-            <button
-              onClick={clearSelections}
-              className="btn btn-primary white-btn"
-            >
-              Clear
-            </button>
-            <button
-              onClick={openContractModal}
-              className="btn btn-primary colored-btn"
-            >
-              Add Contract Address
-            </button>
+            {/* <div className="flex flex-col gap-2 justify-center items-center p-2 border border-gray-300 rounded-md">
+              <span>Amount</span>
+              <div className="flex justify-between gap-4">
+                <input
+                  placeholder="from"
+                  className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
+                />
+                <input
+                  placeholder="to"
+                  className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
+                />
+              </div>
+            </div> */}
+
+            <div className="flex flex-col gap-2 justify-center items-center p-2 border border-gray-300 rounded-md">
+              <span>GAS</span>
+              <div className="flex justify-between gap-4">
+                <input
+                  placeholder="from"
+                  className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
+                />
+                <input
+                  placeholder="to"
+                  className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 justify-center items-center p-2 border border-gray-300 rounded-md">
+              <span>VALUE</span>
+              <div className="flex justify-between gap-4">
+                <input
+                  placeholder="from"
+                  className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
+                />
+                <input
+                  placeholder="to"
+                  className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* FILTER BUTTONS */}
+          <div className="grid xl:grid-cols-2 gap-2 justify-center items-center text-center border rounded p-2">
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handleSearch}
+                className="btn btn-primary white-btn w-full h-[50px]"
+              >
+                Apply Filters
+              </button>
+              <button
+                onClick={clearSelections}
+                className="btn btn-primary white-btn h-[50px]"
+              >
+                Clear
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={openContractModal}
+                className="btn btn-primary w-full h-[50px] colored-btn"
+              >
+                Add Contract Address
+              </button>
+              <button
+                onClick={() => setTelegramModal(true)}
+                className="btn btn-primary w-full h-[50px] colored-btn"
+              >
+                Add Telegram Alerts
+              </button>
+            </div>
           </div>
         </div>
 
@@ -470,7 +566,7 @@ export default function TransactionsComponent() {
 
             {/* VOLUME */}
             <div className="w-full rounded p-2 bg-[#ffff] shadow flex flex-col gap-2">
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid xl:grid-cols-2 gap-2">
                 <div className="border p-2 flex justify-between items-center rounded">
                   <div>Number Of Buyers :</div>
                   <span>{buyVolume.number_of_buyer || 0}</span>
@@ -480,17 +576,23 @@ export default function TransactionsComponent() {
                   <span>{sellVolume.number_of_seller || 0}</span>
                 </div>
               </div>
-              <div className="border p-2 flex justify-between items-center rounded">
+              <div className="border p-2 flex justify-between items-center rounded flex-wrap">
                 <div>Net Volume :</div>
-                <span>{netVolume}</span>
+                <span className="truncate" title={netVolume}>
+                  {netVolume}
+                </span>
               </div>
-              <div className="border p-2 flex justify-between items-center rounded">
+              <div className="border p-2 flex justify-between items-center rounded flex-wrap">
                 <div>Buy Volume :</div>
-                <span>{buyVolume.value || 0}</span>
+                <span className="truncate" title={buyVolume.value}>
+                  {buyVolume.value || 0}
+                </span>
               </div>
-              <div className="border p-2 flex justify-between items-center rounded">
+              <div className="border p-2 flex justify-between items-center rounded flex-wrap">
                 <div>Sell Volume :</div>
-                <span>{sellVolume.value || 0}</span>
+                <span className="truncate" title={sellVolume.value}>
+                  {sellVolume.value || 0}
+                </span>
               </div>
               {isLoading ? (
                 <div className="flex justify-center items-center h-full">
@@ -619,6 +721,56 @@ export default function TransactionsComponent() {
               >
                 Close
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* TELEGRAM Modal */}
+      {telegramModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+          <div className="p-8 bg-white rounded-lg">
+            <h2 className="mb-4 text-lg font-semibold">Add Telegram Alerts</h2>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+              {/* Fields */}
+              <select className="w-full p-2">
+                <option>field_name</option>
+                <option>Ok</option>
+                <option>Ok</option>
+              </select>
+              <div className="flex flex-col gap-2 justify-center items-center p-2 border border-gray-300 rounded-md">
+                <span>Range</span>
+                <div className="flex justify-between gap-4">
+                  <input
+                    placeholder="from"
+                    className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
+                  />
+                  <input
+                    placeholder="to"
+                    className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
+                  />
+                </div>
+              </div>
+              <input
+                type="text"
+                placeholder="Enter Contract Address"
+                value={contractAddress}
+                onChange={handleContractAddressChange}
+                className="px-4 py-2 border border-gray-300 rounded-md w-100"
+              />
+              {/* Buttons */}
+              <div className="flex w-full">
+                <input
+                  type="submit"
+                  value="Submit"
+                  className="btn btn-primary mx-2 colored-btn mt-4 w-full"
+                />
+                <button
+                  onClick={() => setTelegramModal(false)}
+                  className="btn btn-primary bg-red mt-4 w-full"
+                >
+                  Close
+                </button>
+              </div>
             </form>
           </div>
         </div>
