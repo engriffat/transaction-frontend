@@ -35,7 +35,7 @@ export default function TransactionsComponent() {
 
   const [sortedField, setSortedField] = useState(null);
   const [sortOrder, setSortOrder] = useState("asc");
-  const [filterTxHash, setFilterTxHash] = useState("");
+
   const [filterTime, setFilterTime] = useState("");
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [startDate, setStartDate] = useState(null);
@@ -52,6 +52,20 @@ export default function TransactionsComponent() {
   const [tableLoader, setTableLoader] = useState(true);
 
   const [contractKey, setContactkey] = useState("");
+
+  // FILTER States
+  const [status, setStatus] = useState("");
+  const [filterTxHash, setFilterTxHash] = useState("");
+  const [filterVolume, setFilterVolume] = useState("");
+  const [gasFrom, setGasFrom] = useState("");
+  const [gasTo, setGasTo] = useState("");
+  const [valueFrom, setValueFrom] = useState("");
+  const [valueTo, setValueTo] = useState("");
+
+  // TELEGRAM ALERT STATES
+  const [fieldName, setFieldName] = useState("");
+  const [fromValue, setFromValue] = useState("");
+  const [toValue, setToValue] = useState("");
 
   // Sorting function
   const sortedTransactions = [...transactions].sort((a, b) => {
@@ -104,6 +118,16 @@ export default function TransactionsComponent() {
     setSortOrder("");
     setSortedField("");
     setcontractAddress("");
+
+    setTransactions("");
+    setCount("");
+    setVolume("");
+    setBuyVolume("");
+    setSellVolume("");
+    setNetVolume("");
+    setCalculations("");
+
+    getTransactions();
   };
 
   // const [isCopied, setIsCopied] = useState(false);
@@ -157,9 +181,15 @@ export default function TransactionsComponent() {
         body: JSON.stringify({
           contract_address: contractKey || "",
           from_date: startDate || "",
+          from_gas: gasFrom || "",
+          from_value: valueFrom || "",
+          hash: filterTxHash || "",
+          limit: pageSize || "",
+          page_number: page || "",
+          status: status || "",
           to_date: endDate || "",
-          limit: pageSize,
-          page_number: page,
+          to_gas: gasTo || "",
+          to_value: valueTo || "",
         }),
       });
 
@@ -205,13 +235,12 @@ export default function TransactionsComponent() {
       }
 
       const data = await response.json();
-      toast.success(data.Message); // Show success message
-      setContractAddress(""); // Clear input field
+      toast.success(data.Message);
+      setContractAddress("");
       fetchData();
-      setIsModalOpen2(false); // Close modal
+      setIsModalOpen2(false);
     } catch (error) {
       toast.error("Error adding contract address:", error);
-      // Handle error appropriately (show error message, etc.)
     }
   };
 
@@ -228,6 +257,40 @@ export default function TransactionsComponent() {
     setPage(newPage);
   };
 
+  // TELEGRAM API
+  const handleTELEGRAMSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${apiUrl}/api/addTelegram_alerts`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          field_name: fieldName,
+          from_value: fromValue,
+          to_value: toValue,
+          contract_address: contractAddress,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const responseData = await response.json();
+      console.log(responseData.message); // Log success message
+
+      // Clear form fields after successful submission
+      setFieldName("");
+      setFromValue("");
+      setToValue("");
+      setContractAddress("");
+    } catch (error) {
+      console.error(error); // Log error message
+    }
+  };
+
   return (
     <main className="mx-auto text-black container-fluid h-screen !bg-white">
       <ToastContainer />
@@ -235,41 +298,33 @@ export default function TransactionsComponent() {
       <div className="flex flex-col gap-3 bg-[#fafafa] h-full">
         <div className="grid grid-cols-4 mt-4 bg-white rounded shadow-sm p-2 gap-4">
           {/* Filter Inputs */}
-          <div className="col-span-3 gap-2 h-full  grid sm:grid-cols-2 lg:grid-cols-4">
+          <div className="col-span-3 gap-2 h-full  grid sm:grid-cols-2 lg:grid-cols-3">
             <input
               type="text"
               placeholder="Search by TX Hash"
               value={filterTxHash}
               onChange={(e) => setFilterTxHash(e.target.value)}
-              className="p-2 border border-gray-300 rounded-md w-100 h-[40px]"
-            />
-            <input
-              type="text"
-              placeholder="Method"
-              // value={method}
-              // onChange={(e) => setFilterMethod(e.target.value)}
-              className="p-2 border border-gray-300 rounded-md w-100 h-[40px]"
+              className="p-2 border border-gray-300 rounded-md w-100 h-[40px] col-span-2"
             />
             <select
-              type="text"
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
               placeholder="status"
-              // value={method}
-              // onChange={(e) => setFilterMethod(e.target.value)}
               className="p-2 border border-gray-300 rounded-md w-100 h-[40px]"
             >
-              <option selected disabled>
+              <option selected disabled value="">
                 status
               </option>
-              <option>Pending</option>
-              <option>confirmed</option>
+              <option value="Pending">pending</option>
+              <option value={"completed"}>completed</option>
             </select>
-            <input
+            {/* <input
               type="text"
+              value={filterVolume}
+              onChange={(e) => setFilterVolume(e.target.value)}
               placeholder="Volume"
-              // value={method}
-              // onChange={(e) => setFilterMethod(e.target.value)}
               className="p-2 border border-gray-300 rounded-md w-100 h-[40px]"
-            />
+            /> */}
             <div className="flex flex-col gap-2 justify-center items-center p-2 border border-gray-300 rounded-md">
               <span>Date Range</span>
               <div className="flex justify-between gap-4">
@@ -299,28 +354,18 @@ export default function TransactionsComponent() {
               </div>
             </div>
 
-            {/* <div className="flex flex-col gap-2 justify-center items-center p-2 border border-gray-300 rounded-md">
-              <span>Amount</span>
-              <div className="flex justify-between gap-4">
-                <input
-                  placeholder="from"
-                  className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
-                />
-                <input
-                  placeholder="to"
-                  className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
-                />
-              </div>
-            </div> */}
-
             <div className="flex flex-col gap-2 justify-center items-center p-2 border border-gray-300 rounded-md">
               <span>GAS</span>
               <div className="flex justify-between gap-4">
                 <input
+                  value={gasFrom}
+                  onChange={(e) => setGasFrom(e.target.value)}
                   placeholder="from"
                   className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
                 />
                 <input
+                  value={gasTo}
+                  onChange={(e) => setGasTo(e.target.value)}
                   placeholder="to"
                   className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
                 />
@@ -331,10 +376,14 @@ export default function TransactionsComponent() {
               <span>VALUE</span>
               <div className="flex justify-between gap-4">
                 <input
+                  value={valueFrom}
+                  onChange={(e) => setValueFrom(e.target.value)}
                   placeholder="from"
                   className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
                 />
                 <input
+                  value={valueTo}
+                  onChange={(e) => setValueTo(e.target.value)}
                   placeholder="to"
                   className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
                 />
@@ -730,22 +779,36 @@ export default function TransactionsComponent() {
         <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
           <div className="p-8 bg-white rounded-lg">
             <h2 className="mb-4 text-lg font-semibold">Add Telegram Alerts</h2>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-              {/* Fields */}
-              <select className="w-full p-2">
-                <option>field_name</option>
-                <option>Ok</option>
-                <option>Ok</option>
+            <form
+              onSubmit={handleTELEGRAMSubmit}
+              className="flex flex-col gap-2"
+            >
+              <select
+                className="w-full p-2"
+                value={fieldName}
+                onChange={(e) => setFieldName(e.target.value)}
+              >
+                <option value={"Field3"}>field_name</option>
+                <option value={"Field1"}>Field1</option>
+                <option value={"Field2"}>Field2</option>
               </select>
               <div className="flex flex-col gap-2 justify-center items-center p-2 border border-gray-300 rounded-md">
                 <span>Range</span>
                 <div className="flex justify-between gap-4">
                   <input
                     placeholder="from"
+                    type="number"
+                    value={fromValue}
+                    min={0}
+                    onChange={(e) => setFromValue(e.target.value)}
                     className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
                   />
                   <input
                     placeholder="to"
+                    type="number"
+                    min={0}
+                    value={toValue}
+                    onChange={(e) => setToValue(e.target.value)}
                     className="w-[50%] h-[40px] p-2 border border-gray-300 rounded"
                   />
                 </div>
@@ -754,7 +817,7 @@ export default function TransactionsComponent() {
                 type="text"
                 placeholder="Enter Contract Address"
                 value={contractAddress}
-                onChange={handleContractAddressChange}
+                onChange={(e) => setContractAddress(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-md w-100"
               />
               {/* Buttons */}

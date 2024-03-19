@@ -17,6 +17,15 @@ const LivePair = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // FILTER STATE
+  const [contractAddress, setContractAddress] = useState("");
+  const [fromLiquidity, setFromLiquidity] = useState("");
+  const [toLiquidity, setToLiquidity] = useState("");
+  const [fromBuyVolume, setFromBuyVolume] = useState("");
+  const [toBuyVolume, setToBuyVolume] = useState("");
+  const [fromSellVolume, setFromSellVolume] = useState("");
+  const [toSellVolume, setToSellVolume] = useState("");
+
   const totalItems = newToken.length;
 
   const copyToClipboard = async (textToCopy) => {
@@ -38,6 +47,13 @@ const LivePair = () => {
         body: JSON.stringify({
           page_number: page || "",
           limit: pageSize || "",
+          contract_address: contractAddress,
+          form_liquadity: fromLiquidity,
+          to_liquadity: toLiquidity,
+          from_buy_volume: fromBuyVolume,
+          to_buy_volume: toBuyVolume,
+          from_sell_volume: fromSellVolume,
+          to_sell_volume: toSellVolume,
         }),
       });
 
@@ -68,12 +84,21 @@ const LivePair = () => {
   };
 
   const clearSelections = () => {
+    setContractAddress("");
+    setFromLiquidity("");
+    setToLiquidity("");
+    setFromBuyVolume("");
+    setToBuyVolume("");
+    setFromSellVolume("");
+    setToSellVolume("");
     setStartDate(null);
     setEndDate(null);
+
+    fetchData();
   };
 
   const handleSearch = () => {
-    getTransactions();
+    fetchData();
   };
 
   const startIndex = (page - 1) * pageSize;
@@ -86,59 +111,52 @@ const LivePair = () => {
           <div className="col-span-5 grid grid-cols-4 gap-2">
             <input
               type="text"
-              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
+              value={contractAddress}
+              onChange={(e) => setContractAddress(e.target.value)}
+              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none col-span-2"
               placeholder="Contract address"
             />
             <input
               type="text"
+              value={fromLiquidity}
+              onChange={(e) => setFromLiquidity(e.target.value)}
               className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="Pair address"
+              placeholder="From Liquidity"
             />
             <input
               type="text"
+              value={toLiquidity}
+              onChange={(e) => setToLiquidity(e.target.value)}
               className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="LIQUIDITY"
-            />
-            <input
-              type="number"
-              min={0}
-              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="No Of Buys"
+              placeholder="To Liquidity"
             />
             <input
               type="text"
+              value={fromBuyVolume}
+              onChange={(e) => setFromBuyVolume(e.target.value)}
               className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="No Of Sells"
+              placeholder="From Buy Volume"
             />
             <input
               type="text"
+              value={toBuyVolume}
+              onChange={(e) => setToBuyVolume(e.target.value)}
               className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="NO OF BUYERS	"
+              placeholder="To Buy Volume"
             />
             <input
               type="text"
+              value={fromSellVolume}
+              onChange={(e) => setFromSellVolume(e.target.value)}
               className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="NO OF SELLERS	"
+              placeholder="From Sell Volume"
             />
             <input
               type="text"
+              value={toSellVolume}
+              onChange={(e) => setToSellVolume(e.target.value)}
               className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="BUY VOLUME	"
-            />
-            <input
-              type="text"
-              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="SELL VOLUME	"
-            />
-            <input
-              type="text"
-              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="MARKET CAP	"
-            />
-            <input
-              type="text"
-              className="w-full border border-gray-300 py-[8px] rounded-lg px-[10px] outline-none"
-              placeholder="PRICE"
+              placeholder="To Sell Volume"
             />
             <DatePicker
               showTimeSelect
@@ -165,21 +183,22 @@ const LivePair = () => {
             />
           </div>
 
-          <div className="flex gap-2 justify-center items-center text-center px-2 border">
-            <button
-              onClick={clearSelections}
-              className="btn btn-primary white-btn  w-full"
-            >
-              Clear
-            </button>
+          <div className="flex flex-col gap-2 justify-center items-center text-center px-2 border">
             <button
               onClick={handleSearch}
               className="btn bg-black text-white white-btn w-full"
             >
               Submit
             </button>
+            <button
+              onClick={clearSelections}
+              className="btn btn-primary white-btn  w-full"
+            >
+              Clear
+            </button>
           </div>
         </div>
+
         <table className="w-full mx-auto bg-white shadow overflow-hidden sm:rounded-lg">
           <thead className="bg-gray-50">
             <tr>
