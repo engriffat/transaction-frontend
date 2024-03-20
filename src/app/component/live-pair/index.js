@@ -1,7 +1,7 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-import { BsCopy } from "react-icons/bs";
+import { BsBoxArrowUpRight, BsCopy } from "react-icons/bs";
 import { LuLoader } from "react-icons/lu";
 
 const LivePair = () => {
@@ -238,23 +238,33 @@ const LivePair = () => {
                 <tr key={data.id}>
                   <td
                     className="px-6 py-4 cursor-pointer"
-                    onClick={() => copyToClipboard(data?.contract_address)}
+                    // onClick={() => copyToClipboard(data?.contract_address)}
                   >
-                    {`${data?.contract_address.slice(
-                      0,
-                      4
-                    )}...${data?.contract_address.slice(38, 42)}`}{" "}
-                    <BsCopy className="inline-icon" />
+                    <a
+                      href={`https://etherscan.io/address/${data?.contract_address}`}
+                      target="_blank"
+                    >
+                      {`${data?.contract_address.slice(
+                        0,
+                        4
+                      )}...${data?.contract_address.slice(38, 42)}`}{" "}
+                      <BsBoxArrowUpRight className="inline-icon" />
+                    </a>
                   </td>
                   <td
                     className="px-6 py-4 cursor-pointer"
-                    onClick={() => copyToClipboard(data?.pair_address)}
+                    // onClick={() => copyToClipboard(data?.pair_address)}
                   >
-                    {`${data?.pair_address.slice(
-                      0,
-                      4
-                    )}...${data?.pair_address.slice(38, 42)}`}{" "}
-                    <BsCopy className="inline-icon" />
+                    <a
+                      href={`https://etherscan.io/address/${data?.pair_address}`}
+                      target="_blank"
+                    >
+                      {`${data?.pair_address.slice(
+                        0,
+                        4
+                      )}...${data?.pair_address.slice(38, 42)}`}{" "}
+                      <BsBoxArrowUpRight className="inline-icon" />
+                    </a>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {moment(data.createdAt).format("lll")}

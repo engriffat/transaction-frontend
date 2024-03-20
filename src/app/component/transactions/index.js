@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "bootstrap/dist/css/bootstrap.css";
-import { BsCopy } from "react-icons/bs";
+import { BsBoxArrowInUpRight, BsCopy } from "react-icons/bs";
 import { BsBoxArrowUpRight } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -490,50 +490,68 @@ export default function TransactionsComponent() {
                           <td
                             title={transaction.from_address}
                             className="cursor-pointer"
-                            onClick={() =>
-                              copyToClipboard(transaction.from_address)
-                            }
+                            // onClick={() =>
+                            //   copyToClipboard(transaction.from_address)
+                            // }
                           >
-                            {`${transaction?.from_address?.slice(
-                              0,
-                              4
-                            )}...${transaction?.from_address?.slice(
-                              38,
-                              42
-                            )}`}{" "}
-                            <BsCopy className="inline-icon" />
+                            <a
+                              href={`https://etherscan.io/address/${transaction?.from_address}`}
+                              target="_blank"
+                            >
+                              {`${transaction?.from_address?.slice(
+                                0,
+                                4
+                              )}...${transaction?.from_address?.slice(
+                                38,
+                                42
+                              )}`}{" "}
+                              <BsBoxArrowUpRight className="inline-icon" />
+                            </a>
                           </td>
                           <td
                             style={{ width: "15%" }}
                             title={transaction.to_address}
                             className="cursor-pointer"
-                            onClick={() =>
-                              copyToClipboard(transaction.to_address)
-                            }
+                            // onClick={() =>
+                            //   copyToClipboard(transaction.to_address)
+                            // }
                           >
-                            {`${transaction.to_address.slice(
-                              0,
-                              4
-                            )}...${transaction.to_address.slice(38, 42)}`}{" "}
-                            <BsCopy className="inline-icon" />
+                            <a
+                              href={`https://etherscan.io/address/${transaction?.to_address}`}
+                              target="_blank"
+                            >
+                              {`${transaction.to_address.slice(
+                                0,
+                                4
+                              )}...${transaction.to_address.slice(
+                                38,
+                                42
+                              )}`}{" "}
+                              <BsBoxArrowUpRight className="inline-icon" />
+                            </a>
                           </td>
                           <td>{transaction.gas}</td>
                           <td>{transaction.value}</td>
                           <td>{transaction.status}</td>
                           <td
                             className="cursor-pointer"
-                            onClick={() =>
-                              copyToClipboard(transaction.transaction_hash)
-                            }
+                            // onClick={() =>
+                            //   copyToClipboard(transaction.transaction_hash)
+                            // }
                           >
-                            {`${transaction?.transaction_hash?.slice(
-                              0,
-                              4
-                            )}...${transaction?.transaction_hash?.slice(
-                              38,
-                              42
-                            )}`}{" "}
-                            <BsCopy className="inline-icon" />
+                            <a
+                              href={`https://etherscan.io/tx/${transaction?.transaction_hash}`}
+                              target="_blank"
+                            >
+                              {`${transaction?.transaction_hash?.slice(
+                                0,
+                                4
+                              )}...${transaction?.transaction_hash?.slice(
+                                38,
+                                42
+                              )}`}{" "}
+                              <BsBoxArrowUpRight className="inline-icon" />
+                            </a>
                           </td>
                           <td>
                             {moment(transaction?.createdAt).format("lll")}
@@ -658,7 +676,7 @@ export default function TransactionsComponent() {
                       {volume?.contract_address?.slice(0, 6)}
                       <button
                         className="mx-2"
-                        onClick={() => copyToClipboard(volume.contract_address)}
+                        // onClick={() => copyToClipboard(volume.contract_address)}
                       >
                         <BsCopy className="inline-icon" />
                       </button>
