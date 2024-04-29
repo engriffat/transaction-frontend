@@ -4,13 +4,18 @@ import DatePicker from "react-datepicker";
 import { BsBoxArrowUpRight, BsCopy } from "react-icons/bs";
 import { LuLoader } from "react-icons/lu";
 
+import io from "socket.io-client"; // Import socket.io-client
+
 const LivePair = () => {
   const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  const socket = io("http://localhost:5050/"); // Initialize socket connection
 
   const [newToken, setNewToken] = useState([]);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [transectionData, setTransectionData] = useState([]);
 
   const [isLoading, setIsLoading] = useState(true);
 
@@ -36,6 +41,30 @@ const LivePair = () => {
       console.error("Unable to copy to clipboard.", err);
     }
   };
+
+  useEffect(() => {
+    console.log("-----");
+    const socketurl = io("http://localhost:5050/"); // Initialize socket connection
+
+    socketurl.on("connection", () => {
+      console.log("Socket connected");
+    });
+    // return () => {
+    //   socket.disconnect();
+    // };
+  }, []);
+
+  useEffect(() => {
+    console.log("runnig ----", socket);
+
+    socket.emit("getTokens", { limit: 10, page_number: 1 });
+
+    socket.on("tokensData", ({ tokens }) => {
+      console.log("inside tokenDara");
+      console.log("Received tokens data:---", tokens);
+      setTransectionData(tokens);
+    });
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -107,7 +136,7 @@ const LivePair = () => {
   return (
     <div className="mx-auto p-4">
       <div className="-mx-4 overflow-x-auto flex flex-col gap-[50px]">
-        <div className="grid grid-cols-6 gap-2 w-[100%] mt-4 rounded shadow-sm p-2">
+        {/* <div className="grid grid-cols-6 gap-2 w-[100%] mt-4 rounded shadow-sm p-2">
           <div className="col-span-5 grid grid-cols-4 gap-2">
             <input
               type="text"
@@ -197,99 +226,72 @@ const LivePair = () => {
               Clear
             </button>
           </div>
-        </div>
+        </div> */}
 
-        <table className="w-full mx-auto bg-white shadow overflow-hidden sm:rounded-lg">
-          <thead className="bg-gray-50">
-            <tr>
-              {[
-                "Contract Address",
-                "Pair Address",
-                "Created Date",
-                "Liquidity",
-                "No of Buys",
-                "No of Sells",
-                "No of Buyers",
-                "No of Sellers",
-                "Buy Volume",
-                "Sell Volume",
-                "Market Cap",
-                "Price",
-              ].map((header, index) => (
-                <th
-                  key={index}
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {isLoading ? (
-              <div className="flex justify-center items-center h-screen">
-                <LuLoader
-                  size={32}
-                  className="animate-spin ease-out duration-2000"
-                />
-              </div>
-            ) : newToken && newToken.length > 0 ? (
-              newToken.slice(startIndex, endIndex).map((data) => (
-                <tr key={data.id}>
-                  <td
-                    className="px-6 py-4 cursor-pointer"
-                    // onClick={() => copyToClipboard(data?.contract_address)}
-                  >
-                    <a
-                      href={`https://etherscan.io/address/${data?.contract_address}`}
-                      target="_blank"
-                    >
-                      {`${data?.contract_address.slice(
-                        0,
-                        4
-                      )}...${data?.contract_address.slice(38, 42)}`}{" "}
-                      <BsBoxArrowUpRight className="inline-icon" />
-                    </a>
-                  </td>
-                  <td
-                    className="px-6 py-4 cursor-pointer"
-                    // onClick={() => copyToClipboard(data?.pair_address)}
-                  >
-                    <a
-                      href={`https://etherscan.io/address/${data?.pair_address}`}
-                      target="_blank"
-                    >
-                      {`${data?.pair_address.slice(
-                        0,
-                        4
-                      )}...${data?.pair_address.slice(38, 42)}`}{" "}
-                      <BsBoxArrowUpRight className="inline-icon" />
-                    </a>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {moment(data.createdAt).format("lll")}
-                  </td>
-                  <td className="px-6 py-4 ">{data.liquidity}</td>
-                  <td className="px-6 py-4 ">{data.number_of_buyer}</td>
-                  <td className="px-6 py-4 ">{data.number_of_seller}</td>
-                  <td className="px-6 py-4 ">{data.number_of_buyer}</td>
-                  <td className="px-6 py-4 ">{data.number_of_seller}</td>
-                  <td className="px-6 py-4 ">{data.buy_volume}</td>
-                  <td className="px-6 py-4 ">{data.sell_volume}</td>
-                  <td className="px-6 py-4 ">{data.market_cap}</td>
-                  <td className="px-6 py-4 ">{data.price}</td>
-                </tr>
-              ))
-            ) : (
-              <span className="flex justify-center items-center w-full">
-                No data
-              </span>
-            )}
-          </tbody>
-        </table>
+<table className="w-full mx-auto bg-white shadow h-auto overflow-hidden sm:rounded-lg">
+  <thead className="bg-gray-50">
+    <tr>
+      {[
+        "volume(m5)",
+        "volume(h1)",
+        "volume(h6)",
+        "volume(h24)",
+        "txns buy(m5)",
+        "txns sell(m5)",
+        "txns buy(h1)",
+        "txns sell(h1)",
+        "txns buy(h6)",
+        "txns sell(h6)",
+        "txns buy(h24)",
+        "txns sell(h24)",
+      ].map((header, index) => (
+        <th
+          key={index}
+          className="px-6 py-3 text-nowrap overflow-auto text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+        >
+          {header}
+        </th>
+      ))}
+    </tr>
+  </thead>
+  <tbody className="bg-white text-black divide-y divide-gray-200">
+    {!isLoading ? (
+      <tr>
+        <td colSpan="12" className="flex justify-center items-center">
+          <LuLoader size={32} className="animate-spin ease-out duration-2000" />
+        </td>
+      </tr>
+    ) : transectionData && transectionData.length > 0 ? (
+      transectionData.map((data, index) => (
+      <tr key={index} className=" text-black">
+  <td className="px-6 py-4">{data.volume[0]?.m5 || 0}</td>
+  <td className="px-6 py-4">{data.volume[0]?.h1 || 0}</td>
+  <td className="px-6 py-4">{data.volume[0]?.h6 || 0}</td>
+  <td className="px-6 py-4">{data.volume[0]?.h24 || 0}</td>
+  <td className="px-6 py-4">{data.txns[0]?.m5?.buys || 0}</td>
+  <td className="px-6 py-4">{data.txns[0]?.m5?.sells || 0}</td>
+  <td className="px-6 py-4">{data.txns[0]?.h1?.buys || 0}</td>
+  <td className="px-6 py-4">{data.txns[0]?.h1?.sells || 0}</td>
+  <td className="px-6 py-4">{data.txns[0]?.h6?.buys || 0}</td>
+  <td className="px-6 py-4">{data.txns[0]?.h6?.sells || 0}</td>
+  <td className="px-6 py-4">{data.txns[0]?.h24?.buys || 0}</td>
+  <td className="px-6 py-4">{data.txns[0]?.h24?.sells || 0}</td>
+</tr>
+
+      ))
+    ) : (
+      <tr>
+        <td colSpan="12" className="flex justify-center items-center w-full">
+          No data
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
+
       </div>
 
-      {newToken.length > 0 && (
+      {/* {newToken.length > 0 && (
         <div className="tbl-pagination-wrapper py-8  shadow-md !bg-white">
           <div className="pagination-limit-wrapper">
             <span>Show </span>
@@ -323,7 +325,7 @@ const LivePair = () => {
             </button>
           </div>
         </div>
-      )}
+      )} */}
     </div>
   );
 };
