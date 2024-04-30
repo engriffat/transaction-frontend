@@ -158,3 +158,27 @@
 .address-box:hover {
   color: white !important;
 }
+
+.pagination {
+  display: flex;
+  gap: 1rem;
+  /* color: var(--secondary-color); */
+  align-items: center;
+  list-style: none;
+  font-size: 14px;
+  /* font-family: var(--poppins-regular); */
+  font-weight: 500;
+}
+.custom-previous-class,
+.custom-next-class,
+.pagination .active {
+  /* background-color: var(--primary-color); */
+  color: #06798F;
+  border: 1px solid #06798F;
+  padding: 4px 11px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.previous{
+  color: #06798F !important;
+}

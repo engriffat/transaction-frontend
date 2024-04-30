@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import { BsBoxArrowUpRight, BsCopy } from "react-icons/bs";
 import { LuLoader } from "react-icons/lu";
+import ReactPaginate from "react-paginate";
 
 import io from "socket.io-client"; // Import socket.io-client
 
@@ -30,6 +31,21 @@ const LivePair = () => {
   const [toBuyVolume, setToBuyVolume] = useState("");
   const [fromSellVolume, setFromSellVolume] = useState("");
   const [toSellVolume, setToSellVolume] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  console.log("🚀 ~ LivePair ~ currentPage:", currentPage)
+  const [pageCount, setPageCount] = useState(0);
+
+  // Calculate the indexes of the items to be displayed on the current page
+  const indexOfLastItem = (currentPage + 1) * 10;
+  const indexOfFirstItem = indexOfLastItem - 10;
+  const currentItems = transectionData.slice(indexOfFirstItem, indexOfLastItem);
+  console.log("🚀 ~ LivePair ~ currentItems:", currentItems)
+
+  // Change page
+  const handlePageChange = ({ selected }) => {
+    console.log("🚀 ~ handlePageChange ~ selected:", selected)
+    setCurrentPage(selected+1);
+  };
 
   const totalItems = newToken.length;
 
@@ -43,28 +59,24 @@ const LivePair = () => {
   };
 
   useEffect(() => {
-    console.log("-----");
     const socketurl = io("http://localhost:5050/"); // Initialize socket connection
 
     socketurl.on("connection", () => {
       console.log("Socket connected");
     });
-    // return () => {
-    //   socket.disconnect();
-    // };
   }, []);
 
   useEffect(() => {
-    console.log("runnig ----", socket);
-
-    socket.emit("getTokens", { limit: 10, page_number: 1 });
-
-    socket.on("tokensData", ({ tokens }) => {
+    socket.emit("getTokens", { limit: 10, page_number: currentPage });
+    socket.on("tokensData", ({ tokens, count }) => {
+      console.log("🚀 ~ socket.on ~ count:", count);
+      setPageCount(count);
       console.log("inside tokenDara");
       console.log("Received tokens data:---", tokens);
+      setIsLoading(false);
       setTransectionData(tokens);
     });
-  }, []);
+  }, [currentPage]);
 
   const fetchData = async () => {
     try {
@@ -108,9 +120,9 @@ const LivePair = () => {
     setPage(1);
   };
 
-  const handlePageChange = (newPage) => {
-    setPage(newPage);
-  };
+  // const handlePageChange = (newPage) => {
+  //   setPage(newPage);
+  // };
 
   const clearSelections = () => {
     setContractAddress("");
@@ -228,67 +240,90 @@ const LivePair = () => {
           </div>
         </div> */}
 
-<table className="w-full mx-auto bg-white shadow h-auto overflow-hidden sm:rounded-lg">
-  <thead className="bg-gray-50">
-    <tr>
-      {[
-        "volume(m5)",
-        "volume(h1)",
-        "volume(h6)",
-        "volume(h24)",
-        "txns buy(m5)",
-        "txns sell(m5)",
-        "txns buy(h1)",
-        "txns sell(h1)",
-        "txns buy(h6)",
-        "txns sell(h6)",
-        "txns buy(h24)",
-        "txns sell(h24)",
-      ].map((header, index) => (
-        <th
-          key={index}
-          className="px-6 py-3 text-nowrap overflow-auto text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-        >
-          {header}
-        </th>
-      ))}
-    </tr>
-  </thead>
-  <tbody className="bg-white text-black divide-y divide-gray-200">
-    {!isLoading ? (
-      <tr>
-        <td colSpan="12" className="flex justify-center items-center">
-          <LuLoader size={32} className="animate-spin ease-out duration-2000" />
-        </td>
-      </tr>
-    ) : transectionData && transectionData.length > 0 ? (
-      transectionData.map((data, index) => (
-      <tr key={index} className=" text-black">
-  <td className="px-6 py-4">{data.volume[0]?.m5 || 0}</td>
-  <td className="px-6 py-4">{data.volume[0]?.h1 || 0}</td>
-  <td className="px-6 py-4">{data.volume[0]?.h6 || 0}</td>
-  <td className="px-6 py-4">{data.volume[0]?.h24 || 0}</td>
-  <td className="px-6 py-4">{data.txns[0]?.m5?.buys || 0}</td>
-  <td className="px-6 py-4">{data.txns[0]?.m5?.sells || 0}</td>
-  <td className="px-6 py-4">{data.txns[0]?.h1?.buys || 0}</td>
-  <td className="px-6 py-4">{data.txns[0]?.h1?.sells || 0}</td>
-  <td className="px-6 py-4">{data.txns[0]?.h6?.buys || 0}</td>
-  <td className="px-6 py-4">{data.txns[0]?.h6?.sells || 0}</td>
-  <td className="px-6 py-4">{data.txns[0]?.h24?.buys || 0}</td>
-  <td className="px-6 py-4">{data.txns[0]?.h24?.sells || 0}</td>
-</tr>
+        <table className="w-full mx-auto bg-white shadow h-auto overflow-hidden sm:rounded-lg">
+          <thead className="bg-gray-50">
+            <tr>
+              {[
+                "volume(m5)",
+                "volume(h1)",
+                "volume(h6)",
+                "volume(h24)",
+                "txns buy(m5)",
+                "txns sell(m5)",
+                "txns buy(h1)",
+                "txns sell(h1)",
+                "txns buy(h6)",
+                "txns sell(h6)",
+                "txns buy(h24)",
+                "txns sell(h24)",
+              ].map((header, index) => (
+                <th
+                  key={index}
+                  className="px-6 py-3 text-nowrap overflow-auto text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                >
+                  {header}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white text-black divide-y divide-gray-200">
+            {isLoading ? (
+              <tr>
+                <td
+                  colSpan="12"
+                  className="flex self-center justify-center items-center"
+                >
+                  <LuLoader
+                    size={32}
+                    className="animate-spin ease-out duration-2000"
+                  />
+                </td>
+              </tr>
+            ) : transectionData && transectionData.length > 0 ? (
+              transectionData.map((data, index) => (
+                <tr key={index} className=" text-black">
+                  <td className="px-6 py-4">{data.volume[0]?.m5 || 0}</td>
+                  <td className="px-6 py-4">{data.volume[0]?.h1 || 0}</td>
+                  <td className="px-6 py-4">{data.volume[0]?.h6 || 0}</td>
+                  <td className="px-6 py-4">{data.volume[0]?.h24 || 0}</td>
+                  <td className="px-6 py-4">{data.txns[0]?.m5?.buys || 0}</td>
+                  <td className="px-6 py-4">{data.txns[0]?.m5?.sells || 0}</td>
+                  <td className="px-6 py-4">{data.txns[0]?.h1?.buys || 0}</td>
+                  <td className="px-6 py-4">{data.txns[0]?.h1?.sells || 0}</td>
+                  <td className="px-6 py-4">{data.txns[0]?.h6?.buys || 0}</td>
+                  <td className="px-6 py-4">{data.txns[0]?.h6?.sells || 0}</td>
+                  <td className="px-6 py-4">{data.txns[0]?.h24?.buys || 0}</td>
+                  <td className="px-6 py-4">{data.txns[0]?.h24?.sells || 0}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="12"
+                  className="flex justify-center items-center w-full"
+                >
+                  No data
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
 
-      ))
-    ) : (
-      <tr>
-        <td colSpan="12" className="flex justify-center items-center w-full">
-          No data
-        </td>
-      </tr>
-    )}
-  </tbody>
-</table>
-
+        {/* Pagination component */}
+        <div className="flex justify-center mt-4">
+          <ReactPaginate
+            pageCount={Math.ceil(pageCount / 10)}
+            pageRangeDisplayed={5}
+            marginPagesDisplayed={2}
+            onPageChange={handlePageChange}
+            containerClassName={"pagination"}
+            activeClassName={"active"}
+            previousLabel={"Previous"}
+            nextLabel={"Next"}
+            breakLabel={"..."}
+            breakClassName={"break-me"}
+          />
+        </div>
       </div>
 
       {/* {newToken.length > 0 && (
