@@ -8,148 +8,151 @@ import ReactPaginate from "react-paginate";
 import io from "socket.io-client"; // Import socket.io-client
 
 const LivePair = () => {
-  const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+   const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  const socket = io("http://localhost:5050/"); // Initialize socket connection
+   const socket = io("http://localhost:3004/"); // Initialize socket connection
 
-  const [newToken, setNewToken] = useState([]);
+   const [newToken, setNewToken] = useState([]);
 
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
-  const [transectionData, setTransectionData] = useState([]);
+   const [startDate, setStartDate] = useState(null);
+   const [endDate, setEndDate] = useState(null);
+   const [transectionData, setTransectionData] = useState([]);
 
-  const [isLoading, setIsLoading] = useState(true);
+   const [isLoading, setIsLoading] = useState(true);
 
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+   const [page, setPage] = useState(1);
+   const [pageSize, setPageSize] = useState(10);
 
-  // FILTER STATE
-  const [contractAddress, setContractAddress] = useState("");
-  const [fromLiquidity, setFromLiquidity] = useState("");
-  const [toLiquidity, setToLiquidity] = useState("");
-  const [fromBuyVolume, setFromBuyVolume] = useState("");
-  const [toBuyVolume, setToBuyVolume] = useState("");
-  const [fromSellVolume, setFromSellVolume] = useState("");
-  const [toSellVolume, setToSellVolume] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  console.log("🚀 ~ LivePair ~ currentPage:", currentPage)
-  const [pageCount, setPageCount] = useState(0);
+   // FILTER STATE
+   const [contractAddress, setContractAddress] = useState("");
+   const [fromLiquidity, setFromLiquidity] = useState("");
+   const [toLiquidity, setToLiquidity] = useState("");
+   const [fromBuyVolume, setFromBuyVolume] = useState("");
+   const [toBuyVolume, setToBuyVolume] = useState("");
+   const [fromSellVolume, setFromSellVolume] = useState("");
+   const [toSellVolume, setToSellVolume] = useState("");
+   const [currentPage, setCurrentPage] = useState(1);
+   console.log("🚀 ~ LivePair ~ currentPage:", currentPage);
+   const [pageCount, setPageCount] = useState(0);
 
-  // Calculate the indexes of the items to be displayed on the current page
-  const indexOfLastItem = (currentPage + 1) * 10;
-  const indexOfFirstItem = indexOfLastItem - 10;
-  const currentItems = transectionData.slice(indexOfFirstItem, indexOfLastItem);
-  console.log("🚀 ~ LivePair ~ currentItems:", currentItems)
+   // Calculate the indexes of the items to be displayed on the current page
+   const indexOfLastItem = (currentPage + 1) * 10;
+   const indexOfFirstItem = indexOfLastItem - 10;
+   const currentItems = transectionData.slice(
+      indexOfFirstItem,
+      indexOfLastItem
+   );
+   console.log("🚀 ~ LivePair ~ currentItems:", currentItems);
 
-  // Change page
-  const handlePageChange = ({ selected }) => {
-    console.log("🚀 ~ handlePageChange ~ selected:", selected)
-    setCurrentPage(selected+1);
-  };
+   // Change page
+   const handlePageChange = ({ selected }) => {
+      console.log("🚀 ~ handlePageChange ~ selected:", selected);
+      setCurrentPage(selected + 1);
+   };
 
-  const totalItems = newToken.length;
+   const totalItems = newToken.length;
 
-  const copyToClipboard = async (textToCopy) => {
-    try {
-      await navigator.clipboard.writeText(textToCopy);
-      toast.success("Copied!");
-    } catch (err) {
-      console.error("Unable to copy to clipboard.", err);
-    }
-  };
-
-  useEffect(() => {
-    const socketurl = io("http://localhost:5050/"); // Initialize socket connection
-
-    socketurl.on("connection", () => {
-      console.log("Socket connected");
-    });
-  }, []);
-
-  useEffect(() => {
-    socket.emit("getTokens", { limit: 10, page_number: currentPage });
-    socket.on("tokensData", ({ tokens, count }) => {
-      console.log("🚀 ~ socket.on ~ count:", count);
-      setPageCount(count);
-      console.log("inside tokenDara");
-      console.log("Received tokens data:---", tokens);
-      setIsLoading(false);
-      setTransectionData(tokens);
-    });
-  }, [currentPage]);
-
-  const fetchData = async () => {
-    try {
-      const response = await fetch(`${apiUrl}/api/getNewToken`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          page_number: page || "",
-          limit: pageSize || "",
-          contract_address: contractAddress,
-          form_liquadity: fromLiquidity,
-          to_liquadity: toLiquidity,
-          from_buy_volume: fromBuyVolume,
-          to_buy_volume: toBuyVolume,
-          from_sell_volume: fromSellVolume,
-          to_sell_volume: toSellVolume,
-        }),
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error("Failed to fetch transaction data");
+   const copyToClipboard = async (textToCopy) => {
+      try {
+         await navigator.clipboard.writeText(textToCopy);
+         toast.success("Copied!");
+      } catch (err) {
+         console.error("Unable to copy to clipboard.", err);
       }
+   };
 
-      setNewToken(data.data);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error fetching addresses:", error);
-    }
-  };
+   useEffect(() => {
+      const socketurl = io("http://localhost:3004/"); // Initialize socket connection
 
-  useEffect(() => {
-    setIsLoading(true);
-    fetchData();
-  }, [pageSize, page]);
+      socketurl.on("connection", () => {
+         console.log("Socket connected");
+      });
+   }, []);
 
-  const handleFieldChange = (e) => {
-    setPageSize(parseInt(e.target.value, 10));
-    setPage(1);
-  };
+   useEffect(() => {
+      socket.emit("getTokens", { limit: 10, page_number: currentPage });
+      socket.on("tokensData", ({ tokens, count }) => {
+         console.log("🚀 ~ socket.on ~ count:", count);
+         setPageCount(count);
+         console.log("inside tokenDara");
+         console.log("Received tokens data:---", tokens);
+         setIsLoading(false);
+         setTransectionData(tokens);
+      });
+   }, [currentPage]);
 
-  // const handlePageChange = (newPage) => {
-  //   setPage(newPage);
-  // };
+   const fetchData = async () => {
+      try {
+         const response = await fetch(`${apiUrl}/api/getNewToken`, {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+               page_number: page || "",
+               limit: pageSize || "",
+               contract_address: contractAddress,
+               form_liquadity: fromLiquidity,
+               to_liquadity: toLiquidity,
+               from_buy_volume: fromBuyVolume,
+               to_buy_volume: toBuyVolume,
+               from_sell_volume: fromSellVolume,
+               to_sell_volume: toSellVolume,
+            }),
+         });
 
-  const clearSelections = () => {
-    setContractAddress("");
-    setFromLiquidity("");
-    setToLiquidity("");
-    setFromBuyVolume("");
-    setToBuyVolume("");
-    setFromSellVolume("");
-    setToSellVolume("");
-    setStartDate(null);
-    setEndDate(null);
+         const data = await response.json();
+         if (!response.ok) {
+            throw new Error("Failed to fetch transaction data");
+         }
 
-    fetchData();
-  };
+         setNewToken(data.data);
+         setIsLoading(false);
+      } catch (error) {
+         console.error("Error fetching addresses:", error);
+      }
+   };
 
-  const handleSearch = () => {
-    fetchData();
-  };
+   useEffect(() => {
+      setIsLoading(true);
+      fetchData();
+   }, [pageSize, page]);
 
-  const startIndex = (page - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, newToken.length);
+   const handleFieldChange = (e) => {
+      setPageSize(parseInt(e.target.value, 10));
+      setPage(1);
+   };
 
-  return (
-    <div className="mx-auto p-4">
-      <div className="-mx-4 overflow-x-auto flex flex-col gap-[50px]">
-        {/* <div className="grid grid-cols-6 gap-2 w-[100%] mt-4 rounded shadow-sm p-2">
-          <div className="col-span-5 grid grid-cols-4 gap-2">
+   // const handlePageChange = (newPage) => {
+   //   setPage(newPage);
+   // };
+
+   const clearSelections = () => {
+      setContractAddress("");
+      setFromLiquidity("");
+      setToLiquidity("");
+      setFromBuyVolume("");
+      setToBuyVolume("");
+      setFromSellVolume("");
+      setToSellVolume("");
+      setStartDate(null);
+      setEndDate(null);
+
+      fetchData();
+   };
+
+   const handleSearch = () => {
+      fetchData();
+   };
+
+   const startIndex = (page - 1) * pageSize;
+   const endIndex = Math.min(startIndex + pageSize, newToken.length);
+
+   return (
+      <div className="p-4 mx-auto">
+         <div className="-mx-4 overflow-x-auto flex flex-col gap-[50px]">
+            {/* <div className="grid grid-cols-6 gap-2 w-[100%] mt-4 rounded shadow-sm p-2">
+          <div className="grid grid-cols-4 col-span-5 gap-2">
             <input
               type="text"
               value={contractAddress}
@@ -208,7 +211,7 @@ const LivePair = () => {
               endDate={endDate}
               onChange={(date) => setStartDate(date)}
               placeholderText="Start Date & Time"
-              className=" px-4 py-2  border border-gray-300 rounded-md w-full"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md "
             />
             <DatePicker
               showTimeSelect
@@ -220,120 +223,197 @@ const LivePair = () => {
               endDate={endDate}
               minDate={startDate}
               placeholderText="End Date & Time"
-              className="px-4 py-2 border border-gray-300 rounded-md w-full"
+              className="w-full px-4 py-2 border border-gray-300 rounded-md"
             />
           </div>
 
-          <div className="flex flex-col gap-2 justify-center items-center text-center px-2 border">
+          <div className="flex flex-col items-center justify-center gap-2 px-2 text-center border">
             <button
               onClick={handleSearch}
-              className="btn bg-black text-white white-btn w-full"
+              className="w-full text-white bg-black btn white-btn"
             >
               Submit
             </button>
             <button
               onClick={clearSelections}
-              className="btn btn-primary white-btn  w-full"
+              className="w-full btn btn-primary white-btn"
             >
               Clear
             </button>
           </div>
         </div> */}
 
-        <table className="w-full mx-auto bg-white shadow h-auto overflow-hidden sm:rounded-lg">
-          <thead className="bg-gray-50">
-            <tr>
-              {[
-                "volume(m5)",
-                "volume(h1)",
-                "volume(h6)",
-                "volume(h24)",
-                "txns buy(m5)",
-                "txns sell(m5)",
-                "txns buy(h1)",
-                "txns sell(h1)",
-                "txns buy(h6)",
-                "txns sell(h6)",
-                "txns buy(h24)",
-                "txns sell(h24)",
-              ].map((header, index) => (
-                <th
-                  key={index}
-                  className="px-6 py-3 text-nowrap overflow-auto text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  {header}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="bg-white text-black divide-y divide-gray-200">
-            {isLoading ? (
-              <tr>
-                <td
-                  colSpan="12"
-                  className="flex self-center justify-center items-center"
-                >
-                  <LuLoader
-                    size={32}
-                    className="animate-spin ease-out duration-2000"
-                  />
-                </td>
-              </tr>
-            ) : transectionData && transectionData.length > 0 ? (
-              transectionData.map((data, index) => (
-                <tr key={index} className=" text-black">
-                  <td className="px-6 py-4">{data.volume[0]?.m5 || 0}</td>
-                  <td className="px-6 py-4">{data.volume[0]?.h1 || 0}</td>
-                  <td className="px-6 py-4">{data.volume[0]?.h6 || 0}</td>
-                  <td className="px-6 py-4">{data.volume[0]?.h24 || 0}</td>
-                  <td className="px-6 py-4">{data.txns[0]?.m5?.buys || 0}</td>
-                  <td className="px-6 py-4">{data.txns[0]?.m5?.sells || 0}</td>
-                  <td className="px-6 py-4">{data.txns[0]?.h1?.buys || 0}</td>
-                  <td className="px-6 py-4">{data.txns[0]?.h1?.sells || 0}</td>
-                  <td className="px-6 py-4">{data.txns[0]?.h6?.buys || 0}</td>
-                  <td className="px-6 py-4">{data.txns[0]?.h6?.sells || 0}</td>
-                  <td className="px-6 py-4">{data.txns[0]?.h24?.buys || 0}</td>
-                  <td className="px-6 py-4">{data.txns[0]?.h24?.sells || 0}</td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td
-                  colSpan="12"
-                  className="flex justify-center items-center w-full"
-                >
-                  No data
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+            <table className="w-full h-auto mx-auto overflow-hidden bg-white shadow sm:rounded-lg">
+               <thead className="bg-gray-50">
+                  <tr>
+                     {[
+                        "contract address",
+                        "created at",
+                        "creator address",
+                        "creator balance",
+                        "last update time",
+                        "pair address",
+                        "price",
+                        "Holder",
+                        "honey pot reason",
+                        "Mintable",
+                        "Self Destruct",
+                        "buy/sell tax",
+                        "liquidity",
+                        "volume(m5)",
+                        "volume(h1)",
+                        "volume(h6)",
+                        "volume(h24)",
+                        "txns buy(m5)",
+                        "txns sell(m5)",
+                        "txns buy(h1)",
+                        "txns sell(h1)",
+                        "txns buy(h6)",
+                        "txns sell(h6)",
+                        "txns buy(h24)",
+                        "txns sell(h24)",
+                     ].map((header, index) => (
+                        <th
+                           key={index}
+                           className="px-6 py-3 overflow-auto text-xs font-medium tracking-wider text-left text-gray-500 uppercase text-nowrap"
+                        >
+                           {header}
+                        </th>
+                     ))}
+                  </tr>
+               </thead>
+               <tbody className="text-black bg-white divide-y divide-gray-200">
+                  {isLoading ? (
+                     <tr>
+                        <td
+                           colSpan="12"
+                           className="flex items-center self-center justify-center"
+                        >
+                           <LuLoader
+                              size={32}
+                              className="ease-out animate-spin duration-2000"
+                           />
+                        </td>
+                     </tr>
+                  ) : transectionData && transectionData.length > 0 ? (
+                     transectionData.map((data, index) => (
+                        <tr key={index} className="text-black ">
+                           <td className="px-6 py-4">
+                              {data.contract_address}
+                           </td>
+                           <td className="px-6 py-4">{data?.createdAt}</td>
+                           <td className="px-6 py-4">{data?.creatorAddress}</td>
+                           <td className="px-6 py-4">{data?.creatorBalance}</td>
+                           <td className="px-6 py-4">
+                              {data?.lat_update_time}
+                           </td>
+                           <td className="px-6 py-4">{data?.pair_address}</td>
+                           <td className="px-6 py-4">{data?.price}</td>
+                           <td className="px-6 py-4">
+                              {data?.holdersChecks[0]?.holdersCount?.number}
+                           </td>
+                           <td className="px-6 py-4">
+                              {
+                                 data?.honeypotDetails[0]?.honeypotPairs[0]
+                                    ?.honeypotReason
+                              }
+                           </td>
+                           <td className="px-6 py-4">
+                              {
+                                 data?.ownershipChecks[0]?.isMintable
+                                    ?.description
+                              }
+                           </td>
+                           <td className="px-6 py-4">
+                              {
+                                 data?.ownershipChecks[0]?.selfDestruct
+                                    ?.description
+                              }
+                           </td>
+                           <td className="px-6 py-4">
+                              {
+                                 data?.ownershipChecks[0]?.slippageModifiable
+                                    ?.description
+                              }
+                           </td>
+                           <td className="px-6 py-4">
+                              {data?.liquidity[0]?.usd}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.volume[0]?.m5 || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.volume[0]?.h1 || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.volume[0]?.h6 || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.volume[0]?.h24 || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.txns[0]?.m5?.buys || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.txns[0]?.m5?.sells || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.txns[0]?.h1?.buys || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.txns[0]?.h1?.sells || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.txns[0]?.h6?.buys || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.txns[0]?.h6?.sells || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.txns[0]?.h24?.buys || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.txns[0]?.h24?.sells || 0}
+                           </td>
+                        </tr>
+                     ))
+                  ) : (
+                     <tr>
+                        <td
+                           colSpan="12"
+                           className="flex items-center justify-center w-full"
+                        >
+                           No data
+                        </td>
+                     </tr>
+                  )}
+               </tbody>
+            </table>
+         </div>
+         {/* Pagination component */}
+         <div className="flex justify-center mt-4">
+            <ReactPaginate
+               pageCount={Math.ceil(pageCount / 10)}
+               pageRangeDisplayed={5}
+               marginPagesDisplayed={2}
+               onPageChange={handlePageChange}
+               containerClassName={"pagination"}
+               activeClassName={"active"}
+               previousLabel={"Previous"}
+               nextLabel={"Next"}
+               breakLabel={"..."}
+               breakClassName={"break-me"}
+            />
+         </div>
 
-        {/* Pagination component */}
-        <div className="flex justify-center mt-4">
-          <ReactPaginate
-            pageCount={Math.ceil(pageCount / 10)}
-            pageRangeDisplayed={5}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageChange}
-            containerClassName={"pagination"}
-            activeClassName={"active"}
-            previousLabel={"Previous"}
-            nextLabel={"Next"}
-            breakLabel={"..."}
-            breakClassName={"break-me"}
-          />
-        </div>
-      </div>
-
-      {/* {newToken.length > 0 && (
+         {/* {newToken.length > 0 && (
         <div className="tbl-pagination-wrapper py-8  shadow-md !bg-white">
           <div className="pagination-limit-wrapper">
             <span>Show </span>
             <select
               value={pageSize}
               onChange={handleFieldChange}
-              className="w-14 rounded"
+              className="rounded w-14"
             >
               <option value="10">10</option>
               <option value="25">25</option>
@@ -344,7 +424,7 @@ const LivePair = () => {
           </div>
           <div className="flex gap-5">
             <button
-              className="cursor-pointer border-black border rounded py-1 px-2 font-semibold disabled:cursor-not-allowed"
+              className="px-2 py-1 font-semibold border border-black rounded cursor-pointer disabled:cursor-not-allowed"
               onClick={() => handlePageChange(page - 1)}
               disabled={page === 1}
             >
@@ -352,7 +432,7 @@ const LivePair = () => {
             </button>
             <span>{page}</span>
             <button
-              className="cursor-pointer bg-black text-white px-2 py-1 rounded disabled:cursor-not-allowed"
+              className="px-2 py-1 text-white bg-black rounded cursor-pointer disabled:cursor-not-allowed"
               onClick={() => handlePageChange(page + 1)}
               disabled={page === Math.ceil(totalItems / pageSize)}
             >
@@ -361,8 +441,8 @@ const LivePair = () => {
           </div>
         </div>
       )} */}
-    </div>
-  );
+      </div>
+   );
 };
 
 export default LivePair;
