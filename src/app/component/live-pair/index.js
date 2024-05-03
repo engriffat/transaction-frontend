@@ -322,7 +322,9 @@ const LivePair = () => {
                               {formatDate(data?.lat_update_time)}
                            </td>
                            <td className="px-6 py-4">{data?.pair_address}</td>
-                           <td className="px-6 py-4">{data?.price}</td>
+                           <td className="px-6 py-4">
+                              {data?.price?.toString()}
+                           </td>
                            <td className="px-6 py-4">
                               {data?.holdersChecks[0]?.holdersCount?.number}
                            </td>
