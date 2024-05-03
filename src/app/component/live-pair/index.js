@@ -148,6 +148,18 @@ const LivePair = () => {
    const startIndex = (page - 1) * pageSize;
    const endIndex = Math.min(startIndex + pageSize, newToken.length);
 
+   function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      const seconds = String(date.getSeconds()).padStart(2, "0");
+      const formattedDate = `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+      return formattedDate;
+   }
+
    return (
       <div className="p-4 mx-auto">
          <div className="-mx-4 overflow-x-auto flex flex-col gap-[50px]">
@@ -250,7 +262,7 @@ const LivePair = () => {
                         "contract address",
                         "created at",
                         "creator address",
-                        "creator balance",
+                        "creator balance %",
                         "last update time",
                         "pair address",
                         "price",
@@ -301,36 +313,70 @@ const LivePair = () => {
                            <td className="px-6 py-4">
                               {data.contract_address}
                            </td>
-                           <td className="px-6 py-4">{data?.createdAt}</td>
+                           <td className="px-6 py-4 whitespace-nowrap">
+                              {formatDate(data?.createdAt)}
+                           </td>
                            <td className="px-6 py-4">{data?.creatorAddress}</td>
                            <td className="px-6 py-4">{data?.creatorBalance}</td>
-                           <td className="px-6 py-4">
-                              {data?.lat_update_time}
+                           <td className="px-6 py-4 whitespace-nowrap">
+                              {formatDate(data?.lat_update_time)}
                            </td>
                            <td className="px-6 py-4">{data?.pair_address}</td>
                            <td className="px-6 py-4">{data?.price}</td>
                            <td className="px-6 py-4">
                               {data?.holdersChecks[0]?.holdersCount?.number}
                            </td>
-                           <td className="px-6 py-4">
+                           <td
+                              className={
+                                 ("px-6 py-4",
+                                 data?.honeypotDetails[0]?.honeypotPairs[0]?.honeypotReason.toLowerCase() ===
+                                 "transfer failed"
+                                    ? "text-red-600"
+                                    : "text-green-600")
+                              }
+                           >
                               {
                                  data?.honeypotDetails[0]?.honeypotPairs[0]
                                     ?.honeypotReason
                               }
                            </td>
-                           <td className="px-6 py-4">
+                           <td
+                              className={
+                                 ("px-6 py-4",
+                                 data?.ownershipChecks[0]?.isMintable?.description.toLowerCase() ===
+                                 "token supply is fixed"
+                                    ? "text-green-600"
+                                    : "text-red-600")
+                              }
+                           >
                               {
                                  data?.ownershipChecks[0]?.isMintable
                                     ?.description
                               }
                            </td>
-                           <td className="px-6 py-4">
+                           <td
+                              className={
+                                 ("px-6 py-4",
+                                 data?.ownershipChecks[0]?.selfDestruct?.description.toLowerCase() ===
+                                 "no self-destruct mechanism"
+                                    ? "text-green-600"
+                                    : "text-red-600")
+                              }
+                           >
                               {
                                  data?.ownershipChecks[0]?.selfDestruct
                                     ?.description
                               }
                            </td>
-                           <td className="px-6 py-4">
+                           <td
+                              className={
+                                 ("px-6 py-4",
+                                 data?.ownershipChecks[0]?.slippageModifiable?.description.toLowerCase() ===
+                                 "buy/sell tax rates are fixed"
+                                    ? "text-green-600"
+                                    : "text-red-600")
+                              }
+                           >
                               {
                                  data?.ownershipChecks[0]?.slippageModifiable
                                     ?.description
