@@ -272,6 +272,8 @@ const LivePair = () => {
                         "Self Destruct",
                         "buy/sell tax",
                         "liquidity",
+                        "burn liquidity",
+                        "locked percentage",
                         "volume(m5)",
                         "volume(h1)",
                         "volume(h6)",
@@ -386,6 +388,10 @@ const LivePair = () => {
                            </td>
                            <td className="px-6 py-4">
                               {data?.liquidity[0]?.usd}
+                           </td>
+                           <td className="px-6 py-4">{data?.burn_liquidity}</td>
+                           <td className="px-6 py-4">
+                              {data?.locked_percentage}
                            </td>
                            <td className="px-6 py-4">
                               {data.volume[0]?.m5 || 0}
