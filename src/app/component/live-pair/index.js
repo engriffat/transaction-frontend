@@ -272,7 +272,7 @@ const LivePair = () => {
                         "Self Destruct",
                         "buy/sell tax",
                         "liquidity",
-                        "burn liquidity",
+                        "burnt liquidity %",
                         "locked percentage",
                         "volume(m5)",
                         "volume(h1)",
