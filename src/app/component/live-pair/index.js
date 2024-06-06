@@ -10,7 +10,7 @@ import io from "socket.io-client"; // Import socket.io-client
 const LivePair = () => {
    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-   const socket = io("http://localhost:3004/"); // Initialize socket connection
+   const socket = io("http://localhost:3003/"); // Initialize socket connection
 
    const [newToken, setNewToken] = useState([]);
 
@@ -62,7 +62,7 @@ const LivePair = () => {
    };
 
    useEffect(() => {
-      const socketurl = io("http://localhost:3004/"); // Initialize socket connection
+      const socketurl = io("http://localhost:3003/"); // Initialize socket connection
 
       socketurl.on("connection", () => {
          console.log("Socket connected");
@@ -274,6 +274,7 @@ const LivePair = () => {
                         "liquidity",
                         "burnt liquidity %",
                         "locked percentage",
+                        "Unlock time",
                         "volume(m5)",
                         "volume(h1)",
                         "volume(h6)",
@@ -387,11 +388,15 @@ const LivePair = () => {
                               }
                            </td>
                            <td className="px-6 py-4">
-                              {data?.liquidity[0]?.usd}
+                              {/* {data?.liquidity[0]?.usd} */}
+                              {data?.currentLiquidity}
                            </td>
                            <td className="px-6 py-4">{data?.burn_liquidity}</td>
                            <td className="px-6 py-4">
                               {data?.locked_percentage}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data?.unlockDate ? formatDate(data.unlockDate) : '--'}
                            </td>
                            <td className="px-6 py-4">
                               {data.volume[0]?.m5 || 0}
