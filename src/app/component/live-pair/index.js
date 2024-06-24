@@ -275,18 +275,19 @@ const LivePair = () => {
                         "burnt liquidity %",
                         "locked percentage",
                         "Unlock time",
-                        "volume(m5)",
-                        "volume(h1)",
-                        "volume(h6)",
-                        "volume(h24)",
-                        "txns buy(m5)",
-                        "txns sell(m5)",
-                        "txns buy(h1)",
-                        "txns sell(h1)",
-                        "txns buy(h6)",
-                        "txns sell(h6)",
-                        "txns buy(h24)",
-                        "txns sell(h24)",
+                        // "volume(m5)",
+                        // "volume(h1)",
+                        "volume(h6)", // => volume6h
+                        "volume(h24)", // => volume24h
+                        "txns buy volume(h24)",// => buyVolume24h
+                        "txns sell volume(h24)", // =>  sellVolume24h
+                        "txns buy volume(h6)", // => buyVolume6h
+                        "txns sell volume(h6)",// => sellVolume6h
+                        "txns buy(h6)",// => buys6h
+                        "txns sell(h6)", // => sells6h
+                        "txns buy(h24)", //=> buys24h
+                        "txns sell(h24)", //=> sells24h
+
                      ].map((header, index) => (
                         <th
                            key={index}
@@ -398,41 +399,41 @@ const LivePair = () => {
                            <td className="px-6 py-4">
                               {data?.unlockDate ? formatDate(data.unlockDate) : '--'}
                            </td>
-                           <td className="px-6 py-4">
+                           {/* <td className="px-6 py-4">
                               {data.volume[0]?.m5 || 0}
                            </td>
                            <td className="px-6 py-4">
                               {data.volume[0]?.h1 || 0}
+                           </td> */}
+                           <td className="px-6 py-4">
+                              {data.volume6h || 0}
                            </td>
                            <td className="px-6 py-4">
-                              {data.volume[0]?.h6 || 0}
+                              {data.volume24h || 0}
                            </td>
                            <td className="px-6 py-4">
-                              {data.volume[0]?.h24 || 0}
+                              {data.buyVolume24h || 0}
                            </td>
                            <td className="px-6 py-4">
-                              {data.txns[0]?.m5?.buys || 0}
+                              {data.sellVolume24h || 0}
                            </td>
                            <td className="px-6 py-4">
-                              {data.txns[0]?.m5?.sells || 0}
+                              {data.buyVolume6h || 0}
                            </td>
                            <td className="px-6 py-4">
-                              {data.txns[0]?.h1?.buys || 0}
+                              {data.sellVolume6h || 0}
                            </td>
                            <td className="px-6 py-4">
-                              {data.txns[0]?.h1?.sells || 0}
+                              {data.buys6h || 0}
                            </td>
                            <td className="px-6 py-4">
-                              {data.txns[0]?.h6?.buys || 0}
+                              {data.sells6h || 0}
                            </td>
                            <td className="px-6 py-4">
-                              {data.txns[0]?.h6?.sells || 0}
+                              {data.buys24h || 0}
                            </td>
                            <td className="px-6 py-4">
-                              {data.txns[0]?.h24?.buys || 0}
-                           </td>
-                           <td className="px-6 py-4">
-                              {data.txns[0]?.h24?.sells || 0}
+                              {data.sells24h || 0}
                            </td>
                         </tr>
                      ))
