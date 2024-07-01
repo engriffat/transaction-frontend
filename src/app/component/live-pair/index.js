@@ -287,7 +287,12 @@ const LivePair = () => {
                         "txns sell(h6)", // => sells6h
                         "txns buy(h24)", //=> buys24h
                         "txns sell(h24)", //=> sells24h
-
+                        "buy tax min", 
+                        "buy tax max", 
+                        "sell tax min", 
+                        "sell tax max",
+                        "sell volume(5m)", 
+                        "buy volume(5m)"
                      ].map((header, index) => (
                         <th
                            key={index}
@@ -434,6 +439,24 @@ const LivePair = () => {
                            </td>
                            <td className="px-6 py-4">
                               {data.sells24h || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.buy_tax_min || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.buy_tax_max || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.sell_tax_min || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.sell_tax_max || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.sellVolume5m || 0}
+                           </td>
+                           <td className="px-6 py-4">
+                              {data.buyVolume5m || 0}
                            </td>
                         </tr>
                      ))
