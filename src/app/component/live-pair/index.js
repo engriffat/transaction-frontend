@@ -10,7 +10,7 @@ import io from "socket.io-client"; // Import socket.io-client
 const LivePair = () => {
    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-   const socket = io("http://localhost:3003/"); // Initialize socket connection
+   const socket = io("http://localhost:3005/"); // Initialize socket connection
 
    const [newToken, setNewToken] = useState([]);
 
@@ -62,7 +62,7 @@ const LivePair = () => {
    };
 
    useEffect(() => {
-      const socketurl = io("http://localhost:3003/"); // Initialize socket connection
+      const socketurl = io("http://localhost:3005/"); // Initialize socket connection
 
       socketurl.on("connection", () => {
          console.log("Socket connected");
@@ -267,7 +267,7 @@ const LivePair = () => {
                         "pair address",
                         "price",
                         "Holder",
-                        "honey pot reason",
+                        // "honey pot reason",
                         "Mintable",
                         "Self Destruct",
                         "buy/sell tax",
@@ -328,7 +328,7 @@ const LivePair = () => {
                            <td className="px-6 py-4">{data?.creatorAddress}</td>
                            <td className="px-6 py-4">{data?.creatorBalance}</td>
                            <td className="px-6 py-4 whitespace-nowrap">
-                              {formatDate(data?.lat_update_time)}
+                              {formatDate(data?.updatedAt)}
                            </td>
                            <td className="px-6 py-4">{data?.pair_address}</td>
                            <td className="px-6 py-4">
@@ -337,7 +337,7 @@ const LivePair = () => {
                            <td className="px-6 py-4">
                               {data?.holdersChecks[0]?.holdersCount?.number}
                            </td>
-                           <td
+                           {/* <td
                               className={
                                  ("px-6 py-4",
                                  data?.honeypotDetails[0]?.honeypotPairs[0]?.honeypotReason.toLowerCase() ===
@@ -350,33 +350,31 @@ const LivePair = () => {
                                  data?.honeypotDetails[0]?.honeypotPairs[0]
                                     ?.honeypotReason
                               }
-                           </td>
+                           </td> */}
                            <td
                               className={
                                  ("px-6 py-4",
-                                 data?.ownershipChecks[0]?.isMintable?.description.toLowerCase() ===
+                                 data?.token_supply ===
                                  "token supply is fixed"
                                     ? "text-green-600"
                                     : "text-red-600")
                               }
                            >
                               {
-                                 data?.ownershipChecks[0]?.isMintable
-                                    ?.description
+                                 data?.token_supply
                               }
                            </td>
                            <td
                               className={
                                  ("px-6 py-4",
-                                 data?.ownershipChecks[0]?.selfDestruct?.description.toLowerCase() ===
+                                 data?.self_destruct ===
                                  "no self-destruct mechanism"
                                     ? "text-green-600"
                                     : "text-red-600")
                               }
                            >
                               {
-                                 data?.ownershipChecks[0]?.selfDestruct
-                                    ?.description
+                                 data?.self_destruct
                               }
                            </td>
                            <td
