@@ -10,7 +10,7 @@ import io from "socket.io-client"; // Import socket.io-client
 const LivePair = () => {
    const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-   const socket = io("http://localhost:3005/"); // Initialize socket connection
+   const socket = io("http://64.176.84.168:3005/"); // Initialize socket connection
 
    const [newToken, setNewToken] = useState([]);
 
@@ -62,7 +62,7 @@ const LivePair = () => {
    };
 
    useEffect(() => {
-      const socketurl = io("http://localhost:3005/"); // Initialize socket connection
+      const socketurl = io("http://64.176.84.168:3005/"); // Initialize socket connection
 
       socketurl.on("connection", () => {
          console.log("Socket connected");
